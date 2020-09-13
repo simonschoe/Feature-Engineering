@@ -1,0 +1,2 @@
+"0","penguins %>% "
+"0","  filter(rowSums(across(everything(), ~ is.na(.))) > 0)"
