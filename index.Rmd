@@ -97,35 +97,34 @@ comments
 
 ## 2 Introduction to Feature Engineering
 
-Most machine learning models require the data to be of a certain shape. That is, even small perturbation in your features can adversely affect the performance of your model. For example:
+Most machine learning models require the data to be of a certain shape. That is, even small perturbations in your features can adversely affect the performance of your model. For example:
 
-.pull-left[
-**Differently scaled features**  
-- .green[linear regression (scale absorbed by coefficients)]
-- .red[distance-based learners (e.g., SVM or kNN)]
-
-**Highly skewed features**  
-- .green[non-parametric learners (e.g., tree-based methods)]
-- .red[parametric learners which assume normality (e.g., linear regression)]
-
-**Outlier, i.e. extreme data points**
-- .green[trees-based methods, robust regression]
-- .red[linear regression]
- 
-]
-.pull-right[
-**Features that contain missing values**
-- .green[e.g. CART decision trees (surrogate splits)]
-- .red[e.g. C4.5 decision trees or certain RF implementations]
-
-**Multicollinearity among features**
-- .green[e.g. PLS, PCA, penalized regression]
-- .red[e.g. linear regressions or Naive Bayes]
-
-**Irrelevant / uninformative features**
-- .green[stepwise selection and penalized regression]
-- .red[k-NN (computational cost grow exponentially)]  
-]
+```{r, echo=F}
+tibble(
+  Pertubation = c(
+    "Differently scaled features",
+    "Highly skewed features",
+    "Outlier, i.e. extreme data points",
+    "Features that contain missing values",
+    "Multicollinearity among features",
+    "Irrelevant / uninformative features"),
+  'Robust Methods' = c(
+    "Linear regression (scale absorbed by coefficients)",
+    "Non-parametric learners (e.g., tree-based methods)",
+    "Trees-based methods, robust regression",
+    "CART decision trees (surrogate splits)",
+    "PLS, PCA, penalized regression",
+    "Stepwise selection and penalized regression"),
+  'Sensitive Methods' = c(
+    "Distance-based learners (e.g., SVM or kNN)",
+    "Parametric learners which assume normality (e.g., linear regression)",
+    "linear regression",
+    "C4.5 decision trees or certain RF implementations",
+    "Linear regressions or Naive Bayes",
+    "k-NN (computational cost grow exponentially)")
+) %>% 
+  knitr::kable(format = "html")
+```
 
 ???
 comments
@@ -213,7 +212,7 @@ tibble(
 )
 ```
 
-Theoretically, a polynomial contrast can model most non-linear shape in the relationship between the response and the categorical feature of up to degree `C-1`. Yet, in practice the exploration of polynomial contrasts does seldom exceed polynomials of degree 2 [[1]](#references).
+Theoretically, a polynomial contrast can model most non-linear shape in the relationship between the response and the categorical feature of up to degree `C-1`. Yet, in practice the exploration of polynomial contrasts does rarely exceed polynomials of degree 2 [[1]](#references).
 
 ???
 comments
@@ -235,7 +234,7 @@ penguins %>%
   mutate(ratio = (sum(n) - n) / n)
 ```
 
-If a feature is considered a near-zero variance feature, a potential remedy is to lump together rare feature levels together into an "other" category (e.g., using ``forcats::fct_lump()`).
+If a feature is considered a near-zero variance feature, a potential remedy is to lump together rare feature levels into an "other" category (e.g., using ``forcats::fct_lump()`).
 
 ???
 comments
@@ -245,7 +244,7 @@ comments
 ## 3.2 Engineering of Numerical Features (`dbl`, `int`)
 ### 3.2.1 (1:1)-Transformations
 
-**Log-transformation** and **Inversion**: Resolves skewness and shifts the distribution closer to a Gaussian.
+**Log-transformation** and **inversion**: Resolves skewness and shifts the distribution closer to a Gaussian.
 
 ```{r, echo=F, out.height='35%', out.width='35%', fig.retina=3, fig.align='center', out.extra='style="float:left; padding:10px"'}
 penguins %>% 
@@ -501,9 +500,9 @@ comment
 
 The removal of outlier must be guided by the employed model and is context-dependent.
 - On the one hand, the presence of an outlier can be due to errors in the data collection processes.
-- On the other hand, an outlier can be very informative and a valuable data point.
+- On the other hand, an outlier can be a very informative and valuable data point.
 
-A good idea is to run the analysis with and without outlier and compare the results. However, in order to do that, the outlier must be identified in the first place.
+A good idea is to run the analysis with and without outlier and compare the results. However, in order to do so, the outlier must be identified in the first place.
 <br><br><br>
 `r emo::ji("graph")` **Visual detection techniques:** histograms, scatterplots, boxplots, etc.
 
@@ -656,7 +655,7 @@ penguins_pred %>%
 ]
 
 .footnote[.pull-left[
-*Note: You can find multiple references in the literature with regards to the optimal cutoff threshold. Commonly, 1 is applied as a threshold for truncation respectively trimming.*
+*Note: You can find multiple references in the literature with regards to the optimal cutoff threshold for Cook's distance. Commonly, a value of 1 is applied as a threshold for truncation respectively trimming.*
 ]]
 
 ???
@@ -776,18 +775,17 @@ comment on removal: usually you would want to keep as many observations as possi
 - The choice of the imputation learner is independent of the main prediction algorithm. You may even use a flexible imputation learner, if the final prediction model is only a simple linear regression.
 - Since an individual imputation learner is required for each `NA`, the model should be efficiently implementable (e.g., kNN or trees).
 
-**`NA` as categorical predictor:** Create a binary feature that indicates the presence of a `NA`. This way it can be assessed whether the `NA`-dummy is predictive of the response. However, this approach will not lead to any explanation of why this relationship may be informative as the true data is missing in the first place.
+**`NA` as categorical predictor:** Create a binary feature that indicates the presence of a `NA`. This way it can be assessed whether the `NA`-dummy is predictive of the response. However, as the true data is missing in the first place, this approach will not lead to any explanation of why this relationship may be informative.
 
 ???
 assumption here: you have not option of acquiring the missing values ex post. that should always be the first approach if it affordable.
 
 ---
 
-class: inverse
 
 ## 4 Excursus: Data Leakage
 
-Techniques for feature transformation (e.g., z-normalization), outlier correction (e.g., winsorization) or handling missing values (e.g., mean-impuation) **.white[must always be embedded in your resampling approach]**!
+Techniques for feature transformation (e.g., z-normalization), outlier correction (e.g., winsorization) or handling missing values (e.g., mean-impuation) **must always be embedded in your resampling approach**!
 
 - The definition of an outlier is always relative to observations in your data set.
 - The amount of missing values varies from data set to data set.
@@ -799,7 +797,7 @@ Altogether, each of these techniques relies heavily on the concrete train-test-s
 ___
 
 
-A violation of this practice is called **.white[Data leakage]**:
+A violation of this practice is called **Data leakage**:
 
 Information from outside your training data (i.e. your test data) leak into the model training step. This may lead to over-optimistic models that perform extremely well on your test as they have already seen some of the test observations. This happens whenever you do computations over the whole data set.
 
@@ -856,15 +854,22 @@ non-greedy: can move in unfavorable direction first, if its poses beneficial lat
 
 ## 5 Feature Selection
 ### 5.2 Filter Methods `r emo::ji("magnifying glass tilted right")` and Wrapper Methods `r emo::ji("counterclockwise arrows button")`
-.pull-left[
-**Filter methods** [[10]](#references-2) discard features based on domain knowledge or statistical indicators, such as correlations, χ<sup>2</sup> scores, p-values or odds-ratios. These methods follow a rather *heuristic* approach.
 
-Filter methods are applied once, model-agnostic (i.e. independent of the employed model), usually based on univariate/bivariate examinations (no interactions) and computationally cheap.
+.pull-left[
+**Filter methods** [[10]](#references-2) discard features based on domain knowledge or statistical indicators, e.g., correlations, chi-square scores, p-values or odds-ratios. These methods are
+- rather *heuristic* by nature,
+- commonly applied once,
+- model-agnostic (i.e. model-independent),
+- usually based on univariate/bivariate examinations (no interactions), and
+- computationally cheap.
 ]
 .pull-right[
-**Wrapper methods** [[10]](#references-2) wrap the process of model training and feature selection into a for-loop and successively discard irrelevant features. These methods follow a rather *model-driven* approach.
-
-Wrapper methods are iterative search procedures, based on multivariate examinations of the feature space, computationally expensive and require additional validation sets for model assessment.
+**Wrapper methods** [[10]](#references-2) wrap the process of model training and feature selection into a for-loop and successively discard irrelevant features. These methods are
+- rather *model-driven* by nature,
+- iterative search procedures,
+- based on multivariate examinations of the feature space,
+- computationally expensive, and
+- require validation sets for model assessment
 ]
 
 **Potential search strategy:** (1) Start with intrinsic methods or filter methods where you are confident about the applied filters. (2) Migrate to wrappers if you have found a model specification that works for you.
@@ -874,7 +879,7 @@ filter methods: often correlation type measures
 
 ---
 
-## 6 Outlook
+## 6 Outlook: 
 ### Unsupervised Feature Extraction aka Representation Learning
 
 ```{r, echo=F, fig.align='center'}

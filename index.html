@@ -71,35 +71,49 @@ comments
 
 ## 2 Introduction to Feature Engineering
 
-Most machine learning models require the data to be of a certain shape. That is, even small perturbation in your features can adversely affect the performance of your model. For example:
+Most machine learning models require the data to be of a certain shape. That is, even small perturbations in your features can adversely affect the performance of your model. For example:
 
-.pull-left[
-**Differently scaled features**  
-- .green[linear regression (scale absorbed by coefficients)]
-- .red[distance-based learners (e.g., SVM or kNN)]
-
-**Highly skewed features**  
-- .green[non-parametric learners (e.g., tree-based methods)]
-- .red[parametric learners which assume normality (e.g., linear regression)]
-
-**Outlier, i.e. extreme data points**
-- .green[trees-based methods, robust regression]
-- .red[linear regression]
- 
-]
-.pull-right[
-**Features that contain missing values**
-- .green[e.g. CART decision trees (surrogate splits)]
-- .red[e.g. C4.5 decision trees or certain RF implementations]
-
-**Multicollinearity among features**
-- .green[e.g. PLS, PCA, penalized regression]
-- .red[e.g. linear regressions or Naive Bayes]
-
-**Irrelevant / uninformative features**
-- .green[stepwise selection and penalized regression]
-- .red[k-NN (computational cost grow exponentially)]  
-]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Pertubation &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Robust Methods &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Sensitive Methods &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Differently scaled features &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Linear regression (scale absorbed by coefficients) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Distance-based learners (e.g., SVM or kNN) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Highly skewed features &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Non-parametric learners (e.g., tree-based methods) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Parametric learners which assume normality (e.g., linear regression) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Outlier, i.e. extreme data points &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Trees-based methods, robust regression &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; linear regression &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Features that contain missing values &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CART decision trees (surrogate splits) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; C4.5 decision trees or certain RF implementations &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Multicollinearity among features &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; PLS, PCA, penalized regression &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Linear regressions or Naive Bayes &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Irrelevant / uninformative features &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Stepwise selection and penalized regression &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; k-NN (computational cost grow exponentially) &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 
 ???
 comments
@@ -194,7 +208,7 @@ In the case of ordered factor levels (e.g., `low`, `medium` and `high`), we may 
 &gt; 3 high          0.71           0.41
 ```
 
-Theoretically, a polynomial contrast can model most non-linear shape in the relationship between the response and the categorical feature of up to degree `C-1`. Yet, in practice the exploration of polynomial contrasts does seldom exceed polynomials of degree 2 [[1]](#references).
+Theoretically, a polynomial contrast can model most non-linear shape in the relationship between the response and the categorical feature of up to degree `C-1`. Yet, in practice the exploration of polynomial contrasts does rarely exceed polynomials of degree 2 [[1]](#references).
 
 ???
 comments
@@ -220,7 +234,7 @@ For these imbalanced features, one-hot encoding becomes computationally demandin
 &gt; 3 Torgersen    52  5.62
 ```
 
-If a feature is considered a near-zero variance feature, a potential remedy is to lump together rare feature levels together into an "other" category (e.g., using ``forcats::fct_lump()`).
+If a feature is considered a near-zero variance feature, a potential remedy is to lump together rare feature levels into an "other" category (e.g., using ``forcats::fct_lump()`).
 
 ???
 comments
@@ -230,11 +244,11 @@ comments
 ## 3.2 Engineering of Numerical Features (`dbl`, `int`)
 ### 3.2.1 (1:1)-Transformations
 
-**Log-transformation** and **Inversion**: Resolves skewness and shifts the distribution closer to a Gaussian.
-
-&lt;img src="index_files/figure-html/unnamed-chunk-8-1.png" width="35%" height="35%" style="float:left; padding:10px" style="display: block; margin: auto;" /&gt;
+**Log-transformation** and **inversion**: Resolves skewness and shifts the distribution closer to a Gaussian.
 
 &lt;img src="index_files/figure-html/unnamed-chunk-9-1.png" width="35%" height="35%" style="float:left; padding:10px" style="display: block; margin: auto;" /&gt;
+
+&lt;img src="index_files/figure-html/unnamed-chunk-10-1.png" width="35%" height="35%" style="float:left; padding:10px" style="display: block; margin: auto;" /&gt;
 
 .footnote[
 .pull-right[
@@ -324,7 +338,7 @@ comment
 
 **Discretization:** Reduces a numeric feature to a set of categorical features.
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-11-1.png" width="70%" height="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-12-1.png" width="70%" height="70%" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 In certain cases, binning helps to reduce complexity of the relationship between `X` and `Y` and hence to facilitate the interpretation.
@@ -349,7 +363,7 @@ Discretize data by fitting a tree to it
 
 **Discretization:** Reduces a numeric feature to a set of categorical features.
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-12-1.png" width="70%" height="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-13-1.png" width="70%" height="70%" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 In certain cases, binning helps to reduce complexity of the relationship between `X` and `Y` and hence to facilitate the interpretation.
@@ -374,7 +388,7 @@ Discretize data by fitting a tree to it
 
 **Dimensionality reduction techniques:** Generate uncorrelated predictors to resolve multicollinearity.
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-13-1.png" width="70%" height="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-14-1.png" width="70%" height="70%" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 The underlying idea of dimensionality reduction techniques for feature engineering is to extract more informative features from the existing feature set. Usually, this is at the expense of feature interpretability.
@@ -396,9 +410,9 @@ comment
 
 The removal of outlier must be guided by the employed model and is context-dependent.
 - On the one hand, the presence of an outlier can be due to errors in the data collection processes.
-- On the other hand, an outlier can be very informative and a valuable data point.
+- On the other hand, an outlier can be a very informative and valuable data point.
 
-A good idea is to run the analysis with and without outlier and compare the results. However, in order to do that, the outlier must be identified in the first place.
+A good idea is to run the analysis with and without outlier and compare the results. However, in order to do so, the outlier must be identified in the first place.
 &lt;br&gt;&lt;br&gt;&lt;br&gt;
 📉 **Visual detection techniques:** histograms, scatterplots, boxplots, etc.
 
@@ -410,10 +424,10 @@ comment
 ---
 
 ## 3.3 Handling of Extreme Values
-### 3.3.2 Outlier Detection 📉
+### 3.3.2 Outlier Detection 💹
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-14-1.png" width="70%" height="70%" style="display: block; margin: auto auto auto 0;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-15-1.png" width="70%" height="70%" style="display: block; margin: auto auto auto 0;" /&gt;
 ]
 .pull-right[
 **Boxplots elements:**
@@ -432,7 +446,7 @@ comment
 ### 3.3.2 Outlier Detection 📉
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-15-1.png" width="70%" height="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-16-1.png" width="70%" height="70%" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 **Scatterplots with marginal densities:** Convenient tool for identifying outlier in two dimensions.
@@ -478,11 +492,11 @@ A more sophisticated, multidimensional approach goes by the name of **Cook's dis
 
 ]
 .pull-right[
-&lt;img src="index_files/figure-html/unnamed-chunk-16-1.png" width="75%" height="75%" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-17-1.png" width="75%" height="75%" style="display: block; margin: auto;" /&gt;
 ]
 
 .footnote[.pull-left[
-*Note: You can find multiple references in the literature with regards to the optimal cutoff threshold. Commonly, 1 is applied as a threshold for truncation respectively trimming.*
+*Note: You can find multiple references in the literature with regards to the optimal cutoff threshold for Cook's distance. Commonly, a value of 1 is applied as a threshold for truncation respectively trimming.*
 ]]
 
 ???
@@ -535,8 +549,8 @@ Often, it is really non-trivial to come by the reason of an NA:
 ### 3.4.2 Missing Value Detection
 
 .pull-left[
-**Missing value heatmap:** 📉
-&lt;img src="index_files/figure-html/unnamed-chunk-18-1.png" width="75%" height="75%" style="display: block; margin: auto auto auto 0;" /&gt;
+**Missing value heatmap:** 📈
+&lt;img src="index_files/figure-html/unnamed-chunk-19-1.png" width="75%" height="75%" style="display: block; margin: auto auto auto 0;" /&gt;
 ]
 .pull-right[
 **Check number of `NA` per feature:** 🧮
@@ -582,18 +596,17 @@ comment on removal: usually you would want to keep as many observations as possi
 - The choice of the imputation learner is independent of the main prediction algorithm. You may even use a flexible imputation learner, if the final prediction model is only a simple linear regression.
 - Since an individual imputation learner is required for each `NA`, the model should be efficiently implementable (e.g., kNN or trees).
 
-**`NA` as categorical predictor:** Create a binary feature that indicates the presence of a `NA`. This way it can be assessed whether the `NA`-dummy is predictive of the response. However, this approach will not lead to any explanation of why this relationship may be informative as the true data is missing in the first place.
+**`NA` as categorical predictor:** Create a binary feature that indicates the presence of a `NA`. This way it can be assessed whether the `NA`-dummy is predictive of the response. However, as the true data is missing in the first place, this approach will not lead to any explanation of why this relationship may be informative.
 
 ???
 assumption here: you have not option of acquiring the missing values ex post. that should always be the first approach if it affordable.
 
 ---
 
-class: inverse
 
 ## 4 Excursus: Data Leakage
 
-Techniques for feature transformation (e.g., z-normalization), outlier correction (e.g., winsorization) or handling missing values (e.g., mean-impuation) **.white[must always be embedded in your resampling approach]**!
+Techniques for feature transformation (e.g., z-normalization), outlier correction (e.g., winsorization) or handling missing values (e.g., mean-impuation) **must always be embedded in your resampling approach**!
 
 - The definition of an outlier is always relative to observations in your data set.
 - The amount of missing values varies from data set to data set.
@@ -605,7 +618,7 @@ Altogether, each of these techniques relies heavily on the concrete train-test-s
 ___
 
 
-A violation of this practice is called **.white[Data leakage]**:
+A violation of this practice is called **Data leakage**:
 
 Information from outside your training data (i.e. your test data) leak into the model training step. This may lead to over-optimistic models that perform extremely well on your test as they have already seen some of the test observations. This happens whenever you do computations over the whole data set.
 
@@ -660,15 +673,22 @@ non-greedy: can move in unfavorable direction first, if its poses beneficial lat
 
 ## 5 Feature Selection
 ### 5.2 Filter Methods 🔎 and Wrapper Methods 🔄
-.pull-left[
-**Filter methods** [[10]](#references-2) discard features based on domain knowledge or statistical indicators, such as correlations, χ&lt;sup&gt;2&lt;/sup&gt; scores, p-values or odds-ratios. These methods follow a rather *heuristic* approach.
 
-Filter methods are applied once, model-agnostic (i.e. independent of the employed model), usually based on univariate/bivariate examinations (no interactions) and computationally cheap.
+.pull-left[
+**Filter methods** [[10]](#references-2) discard features based on domain knowledge or statistical indicators, e.g., correlations, chi-square scores, p-values or odds-ratios. These methods are
+- rather *heuristic* by nature,
+- commonly applied once,
+- model-agnostic (i.e. model-independent),
+- usually based on univariate/bivariate examinations (no interactions), and
+- computationally cheap.
 ]
 .pull-right[
-**Wrapper methods** [[10]](#references-2) wrap the process of model training and feature selection into a for-loop and successively discard irrelevant features. These methods follow a rather *model-driven* approach.
-
-Wrapper methods are iterative search procedures, based on multivariate examinations of the feature space, computationally expensive and require additional validation sets for model assessment.
+**Wrapper methods** [[10]](#references-2) wrap the process of model training and feature selection into a for-loop and successively discard irrelevant features. These methods are
+- rather *model-driven* by nature,
+- iterative search procedures,
+- based on multivariate examinations of the feature space,
+- computationally expensive, and
+- require validation sets for model assessment
 ]
 
 **Potential search strategy:** (1) Start with intrinsic methods or filter methods where you are confident about the applied filters. (2) Migrate to wrappers if you have found a model specification that works for you.
@@ -678,7 +698,7 @@ filter methods: often correlation type measures
 
 ---
 
-## 6 Outlook
+## 6 Outlook: 
 ### Unsupervised Feature Extraction aka Representation Learning
 
 &lt;img src="./img/representation-learning-images.PNG" width="1833" style="display: block; margin: auto;" /&gt;
