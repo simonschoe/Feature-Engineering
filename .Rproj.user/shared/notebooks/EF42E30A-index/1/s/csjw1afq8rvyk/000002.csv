@@ -1,4 +1,0 @@
-"0","#install.packages(""pacman"")"
-"0","if (!require(""pacman"")) install.packages(""pacman"")"
-"0","pacman::p_load(tidyverse, lubridate, showtext, ggExtra)"
-"0","pacman::p_load_gh(""allisonhorst/palmerpenguins"", ""hadley/emo"")"
