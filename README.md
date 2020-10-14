@@ -1,4 +1,4 @@
-# Introduction to the Tidyverse
+# Feature Engineering
 *The workshop is part of "Machine Learning in R" graduate course held at University of Münster, School of Business and Economics in the winter term 2020/21.*
 
 **Time:** Mo, 2020-11-16 
