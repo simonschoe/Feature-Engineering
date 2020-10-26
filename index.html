@@ -4,8 +4,8 @@
     <title>Machine Learning in R: Workshop Series</title>
     <meta charset="utf-8" />
     <meta name="author" content="Simon Schölzel" />
-    <link rel="stylesheet" href="custom\xaringan-themer.css" type="text/css" />
-    <link rel="stylesheet" href="custom\custom-theme.css" type="text/css" />
+    <link rel="stylesheet" href="custom/xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="custom/custom-theme.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
@@ -15,7 +15,7 @@ class: left, middle, inverse, title-slide
 ## Feature Engineering
 ### Simon Schölzel
 ### <em>Research Team Berens</em>
-### 2020-08-20 (updated: 2020-10-14)
+### 2020-08-20 (updated: 2020-10-25)
 
 ---
 
@@ -62,7 +62,7 @@ In this workshop you will learn about the basic techniques of feature engineerin
 More specifically, after this workshop you will
 - be familiar with the broad field of feature engineering, including feature transformation, feature extraction and feature selection,&lt;br&gt;&lt;br&gt;
 - be able to detect potential pitfalls in the representation of your categorical (`fct`) and numerical (`int`, `dbl`) features and know how to alleviate them,&lt;br&gt;&lt;br&gt;
-- know important techniques for detecting and handling outlier as well as missing values,&lt;br&gt;&lt;br&gt;
+- know important techniques for detecting and handling outliers as well as missing values,&lt;br&gt;&lt;br&gt;
 - be aware of the concept of data leakage and how to prevent it, and&lt;br&gt;&lt;br&gt;
 - have a good overview of the different approaches to feature selection.
 
@@ -77,28 +77,28 @@ comments
 
 **.yellow[Data Pipeline]:**
 
-&gt;**1 Data ingestion**  
-**2 Data exploration (EDA)**  
-**3 Data wrangling**  
-**4 Data splitting / resampling**
+&gt;1 Data ingestion  
+2 Data exploration (EDA)  
+3 Data wrangling  
+4 Data splitting / resampling
 
 **.red[ML Pipeline]:**
 
-&gt;**5 Model training**  
-**6 Model evaluation / testing**  
-**7 Model packaging**
+&gt;5 Model training  
+6 Model evaluation / testing  
+7 Model packaging
 
 **.blue[Software &amp; Code Pipeline]:**
 
-&gt;**8 Model deployment**  
-**9 Model performance monitoring**  
-**10 Model performance logging**
+&gt;8 Model deployment  
+9 Model performance monitoring  
+10 Model performance logging
 
 .pull-right[Source: [ml-ops.org](https://ml-ops.org/content/end-to-end-ml-workflow)]
 
 ???
 1
-- data aquistion: collect data
+- data acquisition: collect data
 - data generation: even generate synthetic data
 - data selection: select relevant data sources
 - data integration: integrate selected data sources
@@ -120,6 +120,7 @@ comments
 - you feed the model into a production environment so that it becomes part of your daily operations (usabale by the end-user)
 9
 - continuous supervision of the model performance based on unseen data (look for indications that re-training is required in case of data drift)
+- **Data Drift:** the test data distribution changes -&gt; model performance degrades without adjustments! -&gt; use new data to retrain the model
 10
 - logging of queries and results in a logfile to be usable for re-training
 
@@ -149,7 +150,7 @@ Most machine learning models require the data to be of a certain shape. That is,
    &lt;td style="text-align:left;"&gt; Parametric learners which assume normality (e.g., linear regression) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Outlier, i.e. extreme data points &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Outliers, i.e. extreme data points &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; Trees-based methods, robust regression &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; linear regression &lt;/td&gt;
   &lt;/tr&gt;
@@ -465,17 +466,17 @@ comment
 ---
 
 ## 4.3 Handling of Extreme Values
-### 4.3.1 Outlier
+### 4.3.1 Outliers
 
 &gt; An outlier is a datapoint that deviates so much from other observations that one might assume a different underlying sampling mechanism. ~ [Enderlein, G. (1987)](#references)
 
-The removal of outlier must be guided by the employed model and is context-dependent.
+The removal of outliers must be guided by the employed model and is context-dependent.
 - On the one hand, the presence of an outlier can be due to errors in the data collection processes.
 - On the other hand, an outlier can be a very informative and valuable data point.
 
-A good idea is to run the analysis with and without outlier and compare the results. However, in order to do so, the outlier must be identified in the first place.
+A good idea is to run the analysis with and without outliers and compare the results. However, in order to do so, the outliers must be identified in the first place.
 &lt;br&gt;&lt;br&gt;&lt;br&gt;
-📉 **Visual detection techniques:** histograms, scatterplots, boxplots, etc.
+💹 **Visual detection techniques:** histograms, scatterplots, boxplots, etc.
 
 🧮 **Numerical detection techniques:** z-score, interquartile range, Cook's distance
 
@@ -485,7 +486,7 @@ comment
 ---
 
 ## 4.3 Handling of Extreme Values
-### 4.3.2 Outlier Detection 💹
+### 4.3.2 Outlier Detection 📈
 
 .pull-left[
 &lt;img src="index_files/figure-html/unnamed-chunk-16-1.png" width="70%" height="70%" style="display: block; margin: auto auto auto 0;" /&gt;
@@ -495,7 +496,7 @@ comment
 - *Horizontal line:* Median&lt;br&gt;&lt;br&gt;
 - *Box area:* inter-quartile range [25%-quartile; 75%-quartile]&lt;br&gt;&lt;br&gt;
 - *Hinge length:* max. 1.5 * IQR&lt;br&gt;&lt;br&gt;
-- *Outlier:* Points beyond the hinges
+- *Outliers:* Points beyond the hinges
 ]
 
 ???
@@ -504,13 +505,13 @@ comment
 ---
 
 ## 4.3 Handling of Extreme Values
-### 4.3.2 Outlier Detection 📉
+### 4.3.2 Outlier Detection 📈
 
 .pull-left[
 &lt;img src="index_files/figure-html/unnamed-chunk-17-1.png" width="70%" height="70%" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
-**Scatterplots with marginal densities:** Convenient tool for identifying outlier in two dimensions.
+**Scatterplots with marginal densities:** Convenient tool for identifying outliers in two dimensions.
 - Even if a data point is quite extreme with respect to one predictor, its value with respect to other predictors can be entirely unremarkable.&lt;br&gt;&lt;br&gt;
 - Outlier detection in higher dimensions requires techniques which take the whole feature space into account.
 ]
@@ -522,7 +523,7 @@ comment
 
 ???
 scatterplot with marginal densities:
-- nice tool to identify outlier with regards to two dimensions
+- nice tool to identify outliers with regards to two dimensions
 
 ---
 
@@ -568,19 +569,19 @@ comment
 ## 4.3 Handling of Extreme Values
 ### 4.3.2 Outlier Detection 🧮
 
-Finally, also the machine learning community has provided novel tools for detecting and handling outlier in a model-driven manner. A prominent approach is the use of **isolation trees** (resp. **isolation forest** [[5]](#references)).
+Finally, also the machine learning community has provided novel tools for detecting and handling outliers in a model-driven manner. A prominent approach is the use of **isolation trees** (resp. **isolation forest** [[5]](#references)).
 
 .pull-left[
 **Main intuition:**
-- Due to their uniqueness, outlier are separated early on the partitioning procedure. Hence, they are closer to the *root* of the tree.
+- Due to their uniqueness, outliers are separated early on the partitioning procedure. Hence, they are closer to the *root* of the tree.
 - The fewer splits required to isolate a sample (i.e. the shorter the *path length*), the more likely the sample is an outlier.
-- By ranking each observations by its path length, outlier can be identified.
+- By ranking each observation by its path length, outliers can be identified.
 ]
 .pull-right[
 &lt;img src="./img/isolation-tree.PNG" width="80%" height="80%" style="display: block; margin: auto;" /&gt;
 ]
 
-**Decision rule:** Relatively short (long) path length indicate outlier (normal samples). Relatively homogeneous path length across all samples indicate the absence of outlier.
+**Decision rule:** Relatively short (long) path length indicate outliers (normal samples). Relatively homogeneous path length across all samples indicate the absence of outliers.
 
 ???
 comment
@@ -610,7 +611,7 @@ Often, it is really non-trivial to come by the reason of an NA:
 ### 4.4.2 Missing Value Detection
 
 .pull-left[
-**Missing value heatmap:** 📈
+**Missing value heatmap:** 💹
 &lt;img src="index_files/figure-html/unnamed-chunk-20-1.png" width="75%" height="75%" style="display: block; margin: auto auto auto 0;" /&gt;
 ]
 .pull-right[
@@ -664,28 +665,31 @@ assumption here: you have not option of acquiring the missing values ex post. th
 
 ---
 
-## 5 Excursus: Data Leakage
+## 5 Excursus: Data Leakage 💧
 
-Techniques for feature transformation (e.g., z-normalization), outlier correction (e.g., winsorization) or handling missing values (e.g., mean-impuation) **must always be embedded in your resampling approach**!
+Pre-processing techniques, such as feature transformation (e.g., z-normalization), outlier correction (e.g., winsorization) or missing values handling (e.g., mean-imputation), depend on the concrete train-test-split (i.e. the training observations) as part of the validation set or cross-validation approach:
 
-- The definition of an outlier is always relative to observations in your data set.
-- The amount of missing values varies from data set to data set.
-- The value estimated via mean-imputation depends on the concrete predictor values in your data.
-- The mean and standard deviation computed by z-normalization depends on your data set.
+- *z-normalization:* The mean and standard deviation depends on your data set.
+- *Winsorization:* The definition of an outlier is relative to the other observations in your data set.
+- *Mean-imputation:* The estimated mean depends on the concrete predictor values in your data.
 
-Altogether, each of these techniques relies heavily on the concrete train-test-split as part of the validation set or cross-validation approach. Hence, these approaches must be incorporated in the modeling pipeline.
+Hence, these approaches must be incorporated in the modeling pipeline by estimating them on the training data and then applying them to the unseen test data.
 
-___
+--
 
-
-A violation of this practice is called **Data leakage**:
-
-Information from outside your training data (i.e. your test data) leak into the model training step. This may lead to over-optimistic models that perform extremely well on your test as they have already seen some of the test observations. This happens whenever you do computations over the whole data set.
+A violation of this practice is called **data leakage** 💧:
+- Information from outside the training data (i.e. the test data) leak into the model training step.
+- The result is an over-optimistic model that performs extremely well on the test set as it has already seen some of the test observations.
+- It likely occurs when computations are performed over the whole data instead of just the training set.
 
 .footnote[
 *Note: Revisit online lecture 5 on resampling methods (in particular slides 17-21).  
 [[8]](#references-2) and [[9]](#references-2) are also great resources for getting an intuitive understanding of data leakage.*
 ]
+
+???
+first part of slide:
+- this also holds for 
 
 ---
 

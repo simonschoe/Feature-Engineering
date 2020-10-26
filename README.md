@@ -1,9 +1,10 @@
 # Feature Engineering
-*The workshop is part of "Machine Learning in R" graduate course held at University of Münster, School of Business and Economics in the winter term 2020/21.*
+*This workshop is part of the "Machine Learning in R" graduate course held at University of Münster, School of Business and Economics (winter term 2020/21).* :mortar_board:
 
-**Time:** Mo, 2020-11-16 
+**Time:** Mo, 2020-11-16  
 **Location:** Zoom  
-**Presenter:** Simon Schölzel, M.Sc.
+**Presenter:** Simon Schölzel, M.Sc.  
+**Slides:** https://simonschoe.github.io/feature-engineering/
 
 <a href="https://www.wiwi.uni-muenster.de/"><img src="https://www.wiwi.uni-muenster.de/fakultaet/sites/all/themes/wwucd/assets/images/logos/secondary_wiwi_aacsb_german.jpg" alt="fb4-logo" height="45"></a> <a href="https://www.wiwi.uni-muenster.de/ctrl/aktuelles"><img src="https://www.wiwi.uni-muenster.de/ctrl/sites/all/themes/wwucd/assets/images/logos/berenslogo5.jpg" alt="ftb-logo" height="45"></a> <a href="https://www.wiwi.uni-muenster.de/iff2/de/news"><img src="https://www.wiwi.uni-muenster.de/iff2/sites/all/themes/wwucd/assets/images/logos/logo_iff2_en2.jpg" alt="ipb-logo" height="45"></a>
 
@@ -31,7 +32,7 @@ More specifically, after this workshop the workshop participants will
 **4 Engineering of Categorical and Numerical Features**
 >4.1 Engineering of Categorical Features  
 4.2 Engineering of Numerical Features  
-4.3 Handling of Extreme Values 
+4.3 Handling of Extreme Values  
 4.4 Handling of Missing Values
 
 **5 Excursus: Data Leakage**
