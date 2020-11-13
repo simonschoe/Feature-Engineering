@@ -26,8 +26,14 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r packages, warning=F, message=F, echo=F}
+#install.packages("pacman")
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(xaringanthemer, tidyverse, lubridate, showtext, ggExtra)
+pacman::p_load_gh("allisonhorst/palmerpenguins", "hadley/emo")
+```
+
 ```{r xaringan-themer, include=FALSE, warning=FALSE}
-library(xaringanthemer)
 style_mono_accent(
   base_color = "#000000",
   link_color = "#0000EE",
@@ -46,13 +52,6 @@ style_mono_accent(
 )
 ```
 
-```{r packages, warning=F, message=F, echo=F}
-#install.packages("pacman")
-if (!require("pacman")) install.packages("pacman")
-pacman::p_load(tidyverse, lubridate, showtext, ggExtra)
-pacman::p_load_gh("allisonhorst/palmerpenguins", "hadley/emo")
-```
-
 name: agenda
 
 ## Agenda
@@ -66,7 +65,7 @@ name: agenda
 **4 Engineering of Categorical and Numerical Features**
 >4.1 Engineering of Categorical Features  
 4.2 Engineering of Numerical Features  
-4.3 Handling of Extreme Values 
+4.3 Handling of Extreme Values  
 4.4 Handling of Missing Values
 
 **5 Excursus: Data Leakage**
@@ -100,30 +99,42 @@ comments
 
 ## 2 The Generic Machine Learning Pipeline
 
+<br><br>
+
+```{r, echo=F, out.width='90%', out.height='90%', fig.align='center'}
+knitr::include_graphics("https://d33wubrfki0l68.cloudfront.net/571b056757d68e6df81a3e3853f54d3c76ad6efc/32d37/diagrams/data-science.png")
+```
+
+.footnote[*Source: see workshop on ["Introduction to the Tidyverse"](https://simonschoe.github.io/introduction-to-the-tidyverse/#8)*]
+
+---
+
+## 2 The Generic Machine Learning Pipeline
+
 ```{r, echo=F, out.height='55%', out.width='55%', fig.align='center', out.extra='style="float:right; padding:10px"'}
 knitr::include_graphics("https://ml-ops.org/img/ml-engineering.jpg")
 ```
 
-**.yellow[Data Pipeline]:**
+**.yellow[Data Pipeline]**
 
 >1 Data ingestion  
 2 Data exploration (EDA)  
 3 Data wrangling  
 4 Data splitting / resampling
 
-**.red[ML Pipeline]:**
+**.red[ML Pipeline]**
 
 >5 Model training  
 6 Model evaluation / testing  
 7 Model packaging
 
-**.blue[Software & Code Pipeline]:**
+**.blue[Software & Code Pipeline]**
 
 >8 Model deployment  
 9 Model performance monitoring  
 10 Model performance logging
 
-.pull-right[Source: [ml-ops.org](https://ml-ops.org/content/end-to-end-ml-workflow)]
+.footnote[*Source: [ml-ops.org](https://ml-ops.org/content/end-to-end-ml-workflow)*]
 
 ???
 1
@@ -158,7 +169,6 @@ knitr::include_graphics("https://ml-ops.org/img/ml-engineering.jpg")
 ## 3 Introduction to Feature Engineering
 
 Most machine learning models require the data to be of a certain shape. That is, even small perturbations in your features can adversely affect the performance of your model. For example:
-
 ```{r, echo=F}
 tibble(
   Pertubation = c(
@@ -186,47 +196,43 @@ tibble(
   knitr::kable(format = "html")
 ```
 
-???
-comments
-
 ---
 
 ## 3 Introduction to Feature Engineering
 
 >[F]eature engineering - the process of creating representations of data that increase the effectiveness of a model. ~ [Kuhn, M./Johnson, K. (2019)](#references)
 
+--
+
 <br>
-The process of ***feature engineering*** subsumes several interrelated steps, such as
-- applying transformations to the data (**feature transformation**),
-- creating new features based on preexisting features (**feature extraction**), and
-- omitting redundant features and retaining informative features (**feature selection**).
+The process of **feature engineering** subsumes several interrelated steps, such as
+- applying transformations to the data (*feature transformation*),
+- creating new features based on preexisting features (*feature extraction*), and
+- omitting redundant features and retaining informative features (*feature selection*).
 
 Moreover, the process of feature engineering may be performed in a *supervised* (data-driven) or *unsupervised* (theory- or knowledge-based) manner.
-
-???
-comments
 
 ---
 
 ## 3 Introduction to Feature Engineering
 
-**Introductory Example:** Have you ever thought about the numerous potential ways of how to represent a date feature (`2020-09-09`) in your machine learning pipeline? There are more options than you would think at first glance...
+**Introductory Example:** Have you ever thought about the numerous ways of representing a date feature (`2020-11-23`)? There are more options than you would think at first glance ...
 <br><br><br>
 **Option 1:** Number of days since *unix time* (`1970-01-01`)
 ```{r, echo=F}
-difftime(as.Date("2020-09-09"), as.Date("1970-01-01"), units="days")
+difftime(as.Date("2020-11-23"), as.Date("1970-01-01"), units="days")
 ```
 **Option 2:** Year, month and day of the week feature
 ```{r, echo=F}
-print(c(lubridate::year("2020-09-09"), lubridate::month("2020-09-09"), lubridate::wday("2020-09-09")))
+print(c(lubridate::year("2020-11-23"), lubridate::month("2020-11-23"), lubridate::wday("2020-11-23")))
 ```
-**Option 3:** Day of the year
+**Option 3:** Day of the year feature
 ```{r, echo=F}
-lubridate::yday("2020-09-09")
+lubridate::yday("2020-11-23")
 ```
 **Option 4:** Boolean period indicator (`2020-06-29` < x < `2020-08-11`)
 ```{r, echo=F}
-between(as.Date("2020-09-09"), as.Date("2020-06-29"), as.Date("2020-08-11"))
+between(as.Date("2020-11-23"), as.Date("2020-06-29"), as.Date("2020-08-11"))
 ```
 
 ---
@@ -239,7 +245,7 @@ layout: false
 ## 4.1 Engineering of Categorical Features
 ### 4.1.1 Encoding of Unordered Features
 
-If a model requires only numerical data as input, categorical features must be transformed into a numerical representation. In the case of an unordered feature with `C` levels, the feature is commonly transformed into a set of `C-1` binary features via **one-hot encoding**.
+If a model requires only numerical data as input, categorical features must be transformed into a numerical representation. In the case of an unordered feature with $C$ levels, the feature is commonly transformed into a set of $C-1$ binary respectively dichotomous features via **one-hot encoding**.
 
 ```{r, echo=F}
 penguins %>% 
@@ -251,11 +257,11 @@ penguins %>%
 ```
 
 .footnote[
-*Note: If your `lm` includes an intercept and you generate `C` dummies, one for each factor level, your final model is overdetermined, i.e. the intercept can always be computed as a linear combination of the `C` dummies. In this case the OLS algorithm may fail as your feature matrix is not invertible.*
+*Note: If your `lm` includes an intercept and you generate $C$ dummies, one for each factor level, your final model is overdetermined, i.e. the intercept can always be computed as a linear combination of the $C$ dummies (adding up to one). In this case the OLS algorithm may fail as your feature matrix is not invertible.*
 ]
 
 ???
-In the online lecture, we have already learned that categorical variables are also called factors.
+- overdetermination implies that one variable can always be safely predicted using all the others -> this introduces perfect multicollinearity by design
 
 ---
 
@@ -264,9 +270,11 @@ In the online lecture, we have already learned that categorical variables are al
 
 In the case of ordered factor levels (e.g., `low`, `medium` and `high`), we may resort to the following approaches:
 
-1. One-hot encoding to generate binary dummies - omits information included in relative ordering
+1. One-hot encoding to generate binary dummies (omits information included in relative ordering)
 2. Representation as a feature of type integer (`int`) with equal intervals between factor levels
 3. Encoding via <a href="https://en.wikipedia.org/wiki/Contrast_(statistics)">polynomial contrasts</a> to produce a numeric (`dbl`) representation
+
+--
 
 **Linear** (**quadratic**) **polynomial contrast** to represent a linear (quadratic) ordering:
 ```{r, echo=F}
@@ -277,41 +285,39 @@ tibble(
 )
 ```
 
-Theoretically, a polynomial contrast can model most non-linear shape in the relationship between the response and the categorical feature of up to degree `C-1`. Yet, in practice the exploration of polynomial contrasts does rarely exceed polynomials of degree 2 [[1]](#references).
-
-???
-comments
+Theoretically, a polynomial contrast can model most non-linear shapes in the relationship between the response and the categorical feature of up to degree $C-1$. Yet, in practice the exploration of polynomial contrasts does rarely exceed polynomials of degree 2 [[1]](#references).
 
 ---
 
 ## 4.1 Engineering of Categorical Features
-### 4.1.3 Aggregation of Near-zero Variance Features
+### 4.1.3 Aggregation of Near-Zero Variance Features
 
-If some feature levels occur very rarely, the feature is frequently considered a **near-zero variance feature**. This is oftentimes the case for categorical features of high cardinality (i.e. where `C` is large).
+If some feature levels occur rarely, the feature is often considered a **near-zero variance** (**zv**) feature. This is frequently the case for categorical features of high cardinality (i.e. where $C$ is large).
 
 For these imbalanced features, one-hot encoding becomes computationally demanding. Simultaneously, certain feature levels may never realize during resampling (e.g., cross-validation) which results in a binary predictor containing only zeros in a given split.
 
-**Rule-of-thumb for near-zero variance features:** `(#zeros / #ones) > 19` [[1]](#references)
+--
 
+**Rule-of-thumb for zv features:** `(#zeros / #ones) > 19` [[1]](#references)
 ```{r, echo=F}
 penguins %>% 
   count(island) %>% 
   mutate(ratio = (sum(n) - n) / n)
 ```
 
-If a feature is considered a near-zero variance feature, a potential remedy is to lump together rare feature levels into an "other" category (e.g., using ``forcats::fct_lump()`).
+If a feature is considered a near-zero variance feature, a potential remedy is to lump together rare feature levels into an `"other"` category (e.g., using ``forcats::fct_lump()`).
 
 ???
-comments
+- one hot encoding introduces high sparsity
 
 ---
 
 ## 4.2 Engineering of Numerical Features
 ### 4.2.1 (1:1)-Transformations
 
-**Log-transformation** and **inversion**: Resolves skewness and shifts the distribution closer to a Gaussian.
-
-```{r, echo=F, out.height='35%', out.width='35%', fig.retina=3, fig.align='center', out.extra='style="float:left; padding:10px"'}
+**Log-transformation** and **inversion**: Resolves skewness and shifts the distribution closer to a Gaussian
+.pull-left[
+```{r, echo=F, fig.width=8, fig.asp=0.618, fig.retina=3, out.extra='style="float:left; padding:10px"'}
 penguins %>% 
   drop_na %>% 
   ggplot() +
@@ -329,8 +335,9 @@ penguins %>%
       axis.title = element_text(size = 14),
     ) 
 ```
-
-```{r, echo=F, out.height='35%', out.width='35%', fig.retina=3, fig.align='center', out.extra='style="float:left; padding:10px"'}
+]
+.pull-right[
+```{r, echo=F, fig.width=8, fig.asp=0.618, fig.retina=3, out.extra='style="float:left; padding:10px"'}
 penguins %>% 
   drop_na %>% 
   ggplot() +
@@ -348,56 +355,47 @@ penguins %>%
       axis.title = element_text(size = 14),
     ) 
 ```
-
-.footnote[
-.pull-right[
-.pull-right[
-*Note: Some of these transformations are problematic for zero or negative values. In such cases simple corrections are available to address these issues.*
-]]]
+]
 
 ???
-comments
-
----
-
-## 4.2 Engineering of Numerical Features
-### 4.2.1 (1:1) Transformations
-
-**Box-Cox power transformation** [[2]](#references): Resolves skewness and shifts the distribution closer to a Gaussian.
-
-
-$$Y^{(\lambda)}=\frac{Y^{\lambda }-1}{\lambda} \quad for \quad \lambda \neq 0$$
-
-$$Y^{(\lambda)}=ln(Y) \quad  for \quad {\lambda} = 0$$
-
-`λ` is considered the so called *power parameter* which can be estimated via maximum likelihood estimation or hyperparameter tuning. Certain values for the parameter `λ` correspond to commonly known transformations:
-- `λ` =   1: no transformation
-- `λ` =   0: log transformation
-- `λ` = 0.5: square root transformation
-- `λ` =  -1: inversion
-
-???
-comment
+- Note: Some of these transformations are problematic for zero or negative values. In such cases simple corrections are available to address these issues.
 
 ---
 
 ## 4.2 Engineering of Numerical Features
 ### 4.2.1 (1:1)-Transformations
 
-**z-Normalization:** Modifies the scale of the predictor.
+**Box-Cox power transformation** [[2]](#references): Resolves skewness and shifts the distribution closer to a Gaussian
 
-$$
-Z=\frac{X-\mu } {\sigma} 
-$$
+$$Y^{(\lambda)}=\frac{Y^{\lambda }-1}{\lambda} \quad for \quad \lambda \neq 0$$
 
-The z-Normalization involves two steps: *centering* (substracting the mean) and *scaling* (dividing by the standard deviation). Afterwards the `Z` follows a standard normal distribution with mean zero and standard deviation of 1.
+$$Y^{(\lambda)}=ln(Y) \quad  for \quad {\lambda} = 0$$
 
-**min/max-Normalization:** Modifies the scale of the predictor.
+$\lambda$ is considered the so called *power parameter* which can be estimated via maximum likelihood estimation or hyperparameter tuning. Certain values for $λ$ correspond to commonly known transformations:
+- $\lambda = 1$: no transformation
+- $\lambda = 0$: log transformation
+- $\lambda = 0.5$: square root transformation
+- $\lambda = -1$: inversion
 
-$$
-X'=  \frac{X - min(X)}{max(X) - min(X))} 
-$$
-The min/max-Normalization transforms the data points to lie on the [0; 1]-interval.  A generalization of min/max-Normalization is **range scaling** where the data points are projected onto an arbitrary interval.
+---
+
+## 4.2 Engineering of Numerical Features
+### 4.2.1 (1:1)-Transformations
+
+$\textbf{z}$**-normalization:** Modifies the scale of the predictor
+
+$$Z=\frac{X-\mu } {\sigma}$$
+
+The $z$-normalization involves two steps: *centering* (subtracting the mean) and *scaling* (dividing by the standard deviation). Afterwards $Z$ follows a standard normal distribution with  $\tilde{}N(0, 1)$.
+
+--
+
+<br><br>
+**min/max-scaling:** Modifies the scale of the predictor
+
+$$X'=  \frac{X - min(X)}{max(X) - min(X))}$$
+
+Min/max-scaling restricts data points to the $[0; 1]$-interval. A generalization of min/max-scaling is **range scaling** where the data points are projected onto an arbitrary interval.
 
 ???
 z-transf: makes values harder to interpret
@@ -408,35 +406,31 @@ min/max: These may be relevant for special algorithms that require the data to b
 ## 4.2 Engineering of Numerical Features
 ### 4.2.2 (1:N)-Transformations
 
-**Basis expansion:** Establishes non-linear relationships between a predictor and the response by adding polynoms (e.g., quadratic and cubic terms).
+**Basis expansion:** Establish non-linear relationships between a predictor and the response by adding polynomials (e.g., quadratic and cubic terms)
 ```{r, eval=F}
 penguins %>% 
-  mutate(
-    bill_length_mm = flipper_length_mm^2, #add quadratic term
-    bill_length_mm = flipper_length_mm^3) #add cubic term
+  dplyr::mutate(
+    bill_length_mm = flipper_length_mm^2, # add quadratic term
+    bill_length_mm = flipper_length_mm^3  # add cubic term
+  )
 ```
 
 This enables us to specify additive models that account for a potential non-linear relationship in the form of:
 
-$$
-Y=X + X^2 + X^3 + ...
-$$
+$$Y=X + X^2 + X^3 +\:...$$
 
 .footnote[
 *Note: A technique related to basis expansion is the inclusion of __interaction terms__ which model non-linear relationship between multiple predictors and the response.*
 ]
-
-???
-comment
 
 ---
 
 ## 4.2 Engineering of Numerical Features
 ### 4.2.2 (1:N)-Transformations
 
-**Discretization:** Reduces a numeric feature to a set of categorical features.
+**Discretization:** Reduces a numeric feature to a set of categorical features
 .pull-left[
-```{r, echo=F, out.height='70%', out.width='70%', fig.retina=3, fig.align='center'}
+```{r, echo=F, fig.width=8, fig.asp=0.618, fig.retina=3, fig.align='center'}
 penguins %>% 
   drop_na %>% 
   ggplot(aes(x = body_mass_g)) +
@@ -456,11 +450,11 @@ penguins %>%
 ```
 ]
 .pull-right[
-In certain cases, binning helps to reduce complexity of the relationship between `X` and `Y` and hence to facilitate the interpretation.
+In certain cases, binning helps to reduce complexity of the relationship between $X$ and $Y$ and hence facilitates the interpretation.
 
 However, it should only be used with great care as
 - it is accompanied by an information loss,
-- it may obscure the relation between `X` and `Y`,
+- it may obscure the relation between $X$ and $Y$,
 - bins are often assigned subjectively, and
 - the model performance oftentimes suffers.
 ]
@@ -468,17 +462,14 @@ However, it should only be used with great care as
 *Note: The `dplyr::cut_width()` function is a good place to start when discretizing numerical predictors.*
 ]]
 
-???
-Discretize data by fitting a tree to it
-
 ---
 
 ## 4.2 Engineering of Numerical Features
 ### 4.2.2 (1:N)-Transformations
 
-**Discretization:** Reduces a numeric feature to a set of categorical features.
+**Discretization:** Reduces a numeric feature to a set of categorical features
 .pull-left[
-```{r, echo=F, out.height='70%', out.width='70%', fig.retina=3, fig.align='center'}
+```{r, echo=F, fig.width=8, fig.asp=0.618, fig.retina=3, fig.align='center'}
 penguins %>% 
   drop_na %>% 
   ggplot(aes(x = body_mass_g)) +
@@ -498,11 +489,11 @@ penguins %>%
 ```
 ]
 .pull-right[
-In certain cases, binning helps to reduce complexity of the relationship between `X` and `Y` and hence to facilitate the interpretation.
+In certain cases, binning helps to reduce complexity of the relationship between $X$ and $Y$ and hence facilitates the interpretation.
 
 However, it should only be used with great care as
 - it is accompanied by an information loss,
-- it may obscure the relation between `X` and `Y`,
+- it may obscure the relation between $X$ and $Y$,
 - bins are often assigned subjectively, and
 - the model performance oftentimes suffers.
 ]
@@ -518,9 +509,9 @@ Discretize data by fitting a tree to it
 ## 4.2 Engineering of Numerical Features
 ### 4.2.3 (N:N)-Transformations
 
-**Dimensionality reduction techniques:** Generate uncorrelated predictors to resolve multicollinearity.
+**Dimensionality reduction techniques:** Generate uncorrelated predictors to resolve multicollinearity
 .pull-left[
-```{r, echo=F, out.height='70%', out.width='70%', fig.retina=3, fig.align='center'}
+```{r, echo=F, fig.width=8, fig.asp=0.618, fig.retina=3, fig.align='center'}
 penguins %>% 
   drop_na %>% 
   prcomp(~ bill_length_mm + bill_depth_mm + flipper_length_mm + body_mass_g, data = ., scale = TRUE) %>% 
@@ -546,15 +537,12 @@ penguins %>%
 ```
 ]
 .pull-right[
-The underlying idea of dimensionality reduction techniques for feature engineering is to extract more informative features from the existing feature set. Usually, this is at the expense of feature interpretability.
+The underlying idea of dimensionality reduction techniques is to extract more informative features from the existing feature set. Usually, this comes at the expense of interpretability.
 
 **Principal Component Analysis** (**PCA**) generates uncorrelated features as linear combinations of existing features in an *unsupervised* manner.
 
 **Partial Least Squares** (**PLS**) **Regression** generates uncorrelated features in a *supervised* manner, i.e. by taking the relationship with the response into account.
 ]
-
-???
-comment
 
 ---
 
@@ -568,13 +556,13 @@ The removal of outliers must be guided by the employed model and is context-depe
 - On the other hand, an outlier can be a very informative and valuable data point.
 
 A good idea is to run the analysis with and without outliers and compare the results. However, in order to do so, the outliers must be identified in the first place.
-<br><br><br>
+
+--
+
+<br><br>
 `r emo::ji("graph")` **Visual detection techniques:** histograms, scatterplots, boxplots, etc.
 
 `r emo::ji("abacus")` **Numerical detection techniques:** z-score, interquartile range, Cook's distance
-
-???
-comment
 
 ---
 
@@ -582,15 +570,14 @@ comment
 ### 4.3.2 Outlier Detection `r emo::ji("graph")`
 
 .pull-left[
-```{r, echo=F, out.height='70%', out.width='70%', fig.retina=3, fig.align='left'}
+```{r, echo=F, fig.width=8, fig.asp=0.618, fig.retina=3, fig.align='center'}
 penguins %>% 
   drop_na %>% 
   ggplot(aes(x = species, y = body_mass_g)) +
-  geom_boxplot(varwidth = T) +
-  geom_jitter(aes(color = species), alpha = 0.3, width = 0.3) +
-  labs(
-      y = "Body mass [grams]"
-    ) +
+    geom_boxplot(varwidth = T) +
+    geom_jitter(aes(color = species), alpha = 0.3, width = 0.3) +
+    scale_y_continuous(breaks = seq(2000, 7000, 500)) +
+    labs(y = "Body mass [grams]") +
     theme_classic() +
     theme(
       axis.text.x = element_text(size = 14),
@@ -602,14 +589,14 @@ penguins %>%
 ]
 .pull-right[
 **Boxplots elements:**
-- *Horizontal line:* Median<br><br>
-- *Box area:* inter-quartile range [25%-quartile; 75%-quartile]<br><br>
-- *Hinge length:* max. 1.5 * IQR<br><br>
-- *Outliers:* Points beyond the hinges
+- **Horizontal line:** Median<br><br>
+- **Box area:** inter-quartile range ( $IQR$ ), corresponds to the $[Q_{0.25}; Q_{0.75}]$-interval<br><br>
+- **Hinge length:** max. $1.5 * IQR$<br><br>
+- **Outliers:** Points beyond the hinges
 ]
 
 ???
-comment
+- outliers indicated here as black dots
 
 ---
 
@@ -617,7 +604,7 @@ comment
 ### 4.3.2 Outlier Detection `r emo::ji("graph")`
 
 .pull-left[
-```{r, echo=F, out.height='70%', out.width='70%', fig.retina=3, fig.align='center', messages=F}
+```{r, echo=F, fig.width=8, fig.asp=0.618, fig.retina=3, fig.align='center', messages=F}
 p <- penguins %>% 
   drop_na %>% 
   ggplot(aes(x = body_mass_g, y = bill_depth_mm)) +
@@ -638,31 +625,29 @@ ggExtra::ggMarginal(p, groupColour = TRUE, groupFill = TRUE)
 ```
 ]
 .pull-right[
-**Scatterplots with marginal densities:** Convenient tool for identifying outliers in two dimensions.
-- Even if a data point is quite extreme with respect to one predictor, its value with respect to other predictors can be entirely unremarkable.<br><br>
+**Scatterplots with marginal densities:** Convenient tool for identifying outliers in two dimensions
+- Even if a data point is extreme with respect to one predictor, its value with respect to other predictors can be entirely unremarkable.<br><br>
 - Outlier detection in higher dimensions requires techniques which take the whole feature space into account.
 ]
 
 .pull-right[
 .footnote[
-*Note: `ggplots`with marginal densities can be generated by combining `ggplot2` with the `ggExtra` package.*
+*Note: Marginal density plots can be generated by combining `ggplot2` with the `ggExtra` package.*
 ]]
-
-???
-scatterplot with marginal densities:
-- nice tool to identify outliers with regards to two dimensions
 
 ---
 
 ## 4.3 Handling of Extreme Values
 ### 4.3.2 Outlier Detection `r emo::ji("abacus")`
 
-Numerical approaches for outlier detection and correction usually involve some form of *truncation* or *trimming* (i.e. elimination). That is, extreme values are either capped respectively artificially lowered or entirely removed from the data set to reduce their influence on the predictive model.
+Numerical approaches for outlier detection and correction usually involve some form of *truncation* or *trimming* (i.e. elimination). Extreme values are either capped respectively artificially lowered or entirely removed from the data set to reduce their influence on the predictive model.
+
+--
 
 Some prominent techniques for pinpointing the truncation respectively trimming threshold are:
-- **z-score correction:** e.g., if z-score outside the [1.96; -1.96]-interval<br><br>
-- **IQR correction:**  if value outside of the IQR, i.e. on the hinges of the Boxplot<br><br>
-- **Winsorizing:** if value exceeds/undercuts a certain percentile, e.g., 95% (similar to z-score correction)
+- $\textbf{z}$**-score correction:** correct if $z$-score lies outside the $[1.96; -1.96]$-interval<br><br>
+- $\textbf{IQR}$ **correction:** correct if value lies outside of the $IQR$ , i.e. on the hinges of the Boxplot<br><br>
+- **Winsorizing:** correct if value exceeds/undercuts a certain percentile, e.g., 95% (similar to $z$-score)
 
 ???
 maybe even tabulating the data and looking at the min max values of the feature
@@ -681,7 +666,7 @@ $$D_i=\frac{e_i^2}{p*s^2} \left[\frac{h_ii}{(1- h_{ii} )^2}\right]$$
 
 ]
 .pull-right[
-```{r, echo=F, out.height='75%', out.width='75%', fig.retina=3, fig.align='center', messages=F, warnings=F}
+```{r, echo=F, fig.width=8, fig.asp=0.618, fig.retina=3, fig.align='center', messages=F, warnings=F}
 lin_reg_mod <- penguins %>% 
   drop_na %>% 
   lm(flipper_length_mm ~ body_mass_g, data = ., y = T, x = T)
@@ -723,20 +708,17 @@ penguins_pred %>%
 *Note: You can find multiple references in the literature with regards to the optimal cutoff threshold for Cook's distance. Commonly, a value of 1 is applied as a threshold for truncation respectively trimming.*
 ]]
 
-???
-comment
-
 ---
 
 ## 4.3 Handling of Extreme Values
 ### 4.3.2 Outlier Detection `r emo::ji("abacus")`
 
-Finally, also the machine learning community has provided novel tools for detecting and handling outliers in a model-driven manner. A prominent approach is the use of **isolation trees** (resp. **isolation forest** [[5]](#references)).
+Finally, also the machine learning community has contributed to novel, data-driven detection techniques. A prominent approach is the so-called **isolation tree** (resp. **isolation forest** [[5]](#references)).
 
 .pull-left[
 **Main intuition:**
-- Due to their uniqueness, outliers are separated early on the partitioning procedure. Hence, they are closer to the *root* of the tree.
-- The fewer splits required to isolate a sample (i.e. the shorter the *path length*), the more likely the sample is an outlier.
+- Due to their uniqueness, outliers are separated early on in the partitioning procedure. Hence, they are closer to the *root* of the tree.
+- The fewer splits are required to isolate a sample (i.e. the shorter the *path length*), the more likely the sample is an outlier.
 - By ranking each observation by its path length, outliers can be identified.
 ]
 .pull-right[
@@ -745,21 +727,18 @@ knitr::include_graphics("./img/isolation-tree.PNG")
 ```
 ]
 
-**Decision rule:** Relatively short (long) path length indicate outliers (normal samples). Relatively homogeneous path length across all samples indicate the absence of outliers.
-
-???
-comment
+**Decision rule:** Relatively short (long) path length indicate outliers (normal samples). Relatively homogeneous path length across all samples suggest the absence of outliers.
 
 ---
 
 ## 4.4 Handling of Missing Values
 ### 4.4.1 Missing Values
 
-Some methods react highly sensitive to the presence of missing values (`NA`). That is, in certain cases the method's implementation in `R` might not even be able to fit a model in the presence of missing values.
+Some methods react highly sensitive to the presence of missing values (`NA`). That is, in certain cases `R` might not even be able to fit a model in the presence of missing values.
 
 **Types of missing values:**
-- **Structural `NA`:** Relates to missing values that are structurally motivated (e.g., number of births per man).<br><br>
-- **Random `NA`:** Relates to missing values that are due to randomness in the data generating process.
+- **Structural `NA`:** Relate to missing values that are structurally motivated (e.g., number of births per man)<br><br>
+- **Random `NA`:** Relate to missing values that are due to randomness in the data generating process
   - *Missing completely at random (MCAR):* The likelihood of `NA` is independent of the variable itself as well as any other variable in the data set. [[6]](#references)
   - *Missing at random (MAR):* The likelihood of `NA` is independent of the variable itself, but can be  explained by other variables in the data set. [[6]](#references)<br><br>
 - **Non-random `NA`:** The likelihood of `NA` depends only on the variable itself (e.g., negative customer reviews). This type of `NA` is considered informative and referred to as *not missing at random (NMAR)*. [[6]](#references)
@@ -767,7 +746,7 @@ Some methods react highly sensitive to the presence of missing values (`NA`). Th
 ???
 Often, it is really non-trivial to come by the reason of an NA:
 - usually requires domain knowledge
-- usually requires information about the data collection process
+- usually requires information about the data collection/generating process
 
 ---
 
@@ -776,7 +755,7 @@ Often, it is really non-trivial to come by the reason of an NA:
 
 .pull-left[
 **Missing value heatmap:** `r emo::ji("graph")`
-```{r, echo=F, out.height='75%', out.width='75%', fig.retina=3, fig.align='left'}
+```{r, echo=F, fig.width=8, fig.asp=0.618, fig.retina=3, fig.align='left'}
 penguins %>%
   mutate(
     across(everything(), ~if_else(is.na(.) == T, 1, 0) %>% as.factor()),
@@ -812,19 +791,16 @@ penguins %>%
 ```
 ]
 
-???
-comment
-
 ---
 
 ## 4.4 Handling of Missing Values
 ### 4.4.3 Missing Values: Handling of Random `NA`
 
-**Removal:** Discard the observation (row) or predictor (column) containing the `NA`.
+**Removal:** Discard the observation (row) or predictor (column) containing the `NA`
 - Discard the observation (row) if the data set is relatively large or `NA`s are rare.
 - Discard the predictor (column) if it is highly correlated with other predictors not subject to `NA`. 
 
-**Robust algorithms:** Use algorithms that are robust against the presence of `NA`. For example, the *CART* algorithm for decision trees effectively handles missing values by enabling surrogate splits. Alternatively, [[7]](#references) discusses outlier robust estimators in the context of linear regression.
+**Robust algorithms:** Use algorithms that are robust to the presence of `NA`. For example, the *CART* algorithm for decision trees effectively handles missing values by enabling surrogate splits. Alternatively, [[7]](#references) discusses outlier robust estimators in the context of linear regression.
 
 ???
 comment on removal: usually you would want to keep as many observations as possible. removal only really is feasible in the presence of big data
@@ -834,44 +810,49 @@ comment on removal: usually you would want to keep as many observations as possi
 ## 4.4 Handling of Missing Values
 ### 4.4.3 Missing Values: Handling of Non-Random `NA`
 
-**Mean-/median-imputation:** Impute `NA` using central tendency measures, e.g., the mean or median.
+**Mean-/median-imputation:** Impute `NA` using central tendency measures, e.g., the mean or median
 
-**Model-based imputation:** Impute `NA` using an adaptive model (i.e. *imputation learner*) that predicts the missing value using all other non-missing predictors.
+**Model-based imputation:** Impute `NA` using an adaptive model (i.e. *imputation learner*) that predicts the missing value using all other non-missing predictors
 - The choice of the imputation learner is independent of the main prediction algorithm. You may even use a flexible imputation learner, if the final prediction model is only a simple linear regression.
-- Since an individual imputation learner is required for each `NA`, the model should be efficiently implementable (e.g., kNN or trees).
+- Since an individual imputation learner is required for each `NA`, the model should be efficiently implementable (e.g., k-NN or decision trees).
 
 **`NA` as categorical predictor:** Create a binary feature that indicates the presence of a `NA`. This way it can be assessed whether the `NA`-dummy is predictive of the response. However, as the true data is missing in the first place, this approach will not lead to any explanation of why this relationship may be informative.
 
 ???
-assumption here: you have not option of acquiring the missing values ex post. that should always be the first approach if it affordable.
+assumption here: you have no option of acquiring the missing values ex post. that should always be the first approach if it affordable.
 
 ---
 
 ## 5 Excursus: Data Leakage `r emo::ji("droplet")`
 
-Pre-processing techniques, such as feature transformation (e.g., z-normalization), outlier correction (e.g., winsorization) or missing values handling (e.g., mean-imputation), depend on the concrete train-test-split (i.e. the training observations) as part of the validation set or cross-validation approach:
+**Intuition:** Pre-processing techniques, such as feature transformation (e.g., $z$-normalization), outlier correction (e.g., winsorization) or missing values handling (e.g., mean-imputation), depend on the concrete train-test-split (i.e. the training observations) as part of the validation set or cross-validation approach:
 
-- *z-normalization:* The mean and standard deviation depends on your data set.
-- *Winsorization:* The definition of an outlier is relative to the other observations in your data set.
+- $z$*-normalization:* The mean and standard deviation depends on your data set.<br><br>
+- *Winsorization:* The definition of an outlier is relative to the other observations in your data set.<br><br>
 - *Mean-imputation:* The estimated mean depends on the concrete predictor values in your data.
 
 Hence, these approaches must be incorporated in the modeling pipeline by estimating them on the training data and then applying them to the unseen test data.
 
---
+---
 
-A violation of this practice is called **data leakage** `r emo::ji("droplet")`:
-- Information from outside the training data (i.e. the test data) leak into the model training step.
-- The result is an over-optimistic model that performs extremely well on the test set as it has already seen some of the test observations.
+## 5 Excursus: Data Leakage `r emo::ji("droplet")`
+
+.pull-left[
+A violation of this practice is called **data leakage**:
+- Information from outside the training set (i.e. the test set) leak into the model training step.<br><br>
+- The result is an over-optimistic model that performs extremely well on the test set as it has already seen some of the test samples.<br><br>
 - It likely occurs when computations are performed over the whole data instead of just the training set.
-
-.footnote[
-*Note: Revisit online lecture 5 on resampling methods (in particular slides 17-21).  
-[[8]](#references-2) and [[9]](#references-2) are also great resources for getting an intuitive understanding of data leakage.*
 ]
+.pull-right[
+```{r, echo=F, out.width='70%', fig.align='center'}
+knitr::include_graphics("./img/leakage-meme.jpg")
+```
+]
+.footnote[
+*Note: Revisit online lecture 5 on resampling methods (in particular slides 17-21). [[8]](#references-2) and [[9]](#references-2) are also great resources for getting an intuitive understanding of data leakage.*
 
-???
-first part of slide:
-- this also holds for 
+*Source: [deeplearning.ai](https://www.linkedin.com/posts/deeplearningai_reminder-dont-train-on-test-data-creds-activity-6647926795935068160-NhSd).*
+]
 
 ---
 
@@ -879,12 +860,16 @@ first part of slide:
 
 In general, there is little theory on how to best engineer your features. Thus, you may begin engineering a large set of feature candidates which you then narrow down. Ideally, you will be able to drop all features that do not contain any information for predicting the response. This approach is known as **feature selection**.
 
+--
+
 **Reasons for feature selection:**
 - Parsimonious models (so-called *white box models*) are easier to interpret.
 - A reduced set of features increases training speed and lowers the cost of data collection and storage.
 - Feature selection helps to tackle the problem of *overfitting* and reduces the dimensionality.
 - Certain models react highly sensitive to correlated predictors (e.g., linear regressions).
 - Certain models react highly sensitive to uninformative predictors (e.g., SVM).
+
+--
 
 **Approaches to feature selection:**
 - Intrinsic methods `r emo::ji("package")`
@@ -896,7 +881,7 @@ In general, there is little theory on how to best engineer your features. Thus, 
 ## 6 Feature Selection
 ### 6.1 Intrinsic Methods `r emo::ji("package")`
 
-Intrinsic methods provide embedded feature selection functionalities. This broadly refers to all methods that have some type of regularization built-in, such as Lasso or pruned decision trees.
+Intrinsic methods provide embedded feature selection capabilities. This broadly refers to all methods that have some type of regularization built-in, such as Lasso regression or pruned decision trees.
 
 - Feature selection is directly linked to the objective function (e.g., RMSE or misclassification error). 
 - Intrinsic methods are model dependent and usually do not apply to other methods in the same way.
@@ -913,9 +898,8 @@ knitr::include_graphics("https://tenor.com/view/cookies-gif-14785632.gif")
 
 **Non-greedy algorithm:** Search for the best overall solution by re-evaluating past choices. Non-greedy algorithms are able to find *global optima* (e.g., genetic algorithms or and simulated annealing).
 
-
 ???
-non-greedy: can move in unfavorable direction first, if its poses beneficial later
+non-greedy: can move in unfavorable direction first, if it turns out to be beneficial later
 
 ---
 
@@ -923,40 +907,45 @@ non-greedy: can move in unfavorable direction first, if its poses beneficial lat
 ### 6.2 Filter Methods `r emo::ji("magnifying glass tilted right")` and Wrapper Methods `r emo::ji("counterclockwise arrows button")`
 
 .pull-left[
-**Filter methods** [[10]](#references-2) discard features based on domain knowledge or statistical indicators, e.g., correlations, chi-square scores, p-values or odds-ratios. These methods are
+**Filter methods** [[10]](#references-2) discard features based on domain knowledge or statistical indicators, e.g., correlations, chi-square scores, $p$-values or odds-ratios. These methods are
 - rather *heuristic* by nature,
 - commonly applied once,
 - model-agnostic (i.e. model-independent),
 - usually based on univariate/bivariate examinations (no interactions), and
 - computationally cheap.
 ]
+
+--
+
 .pull-right[
 **Wrapper methods** [[10]](#references-2) wrap the process of model training and feature selection into a for-loop and successively discard irrelevant features. These methods are
 - rather *model-driven* by nature,
 - iterative search procedures,
 - based on multivariate examinations of the feature space,
 - computationally expensive, and
-- require validation sets for model assessment
+- require validation sets for model assessment.
 ]
+
+--
 
 **Potential search strategy:** (1) Start with intrinsic methods or filter methods where you are confident about the applied filters. (2) Migrate to wrappers if you have found a model specification that works for you.
 
 ???
-filter methods: often correlation type measures
+summary:
+- intrinsic: the model has selection capabilities
+- filter: you perform the selection
+- wrapper: selection is wrapped into an approach that optimizes a user-defines loss function
 
 ---
 
-## 7 Outlook: 
+## 7 Outlook
 ### Unsupervised Feature Extraction aka Representation Learning
 
 ```{r, echo=F, fig.align='center'}
 knitr::include_graphics("./img/representation-learning-images.PNG")
 ```
-<br>
-Source: [[11]](#references)
 
-???
-comments
+.footnote[*Source: [[11]](#references)*]
 
 ---
 
@@ -967,19 +956,16 @@ comments
 ```{r, echo=F, fig.align='center', out.height='80%', out.width='80%'}
 knitr::include_graphics("./img/representation-learning-word2vec.PNG")
 ```
-<br>
-Source: [[12]](#references-2)
+
+.footnote[*Source: [[12]](#references-2)*]
 ]
 .pull-right[
 ```{r, echo=F, fig.align='center', out.height='80%', out.width='80%'}
 knitr::include_graphics("./img/representation-learning-doc-embeddings.PNG")
 ```
-<br>
-Source: [[13]](#references-2)
-]
 
-???
-comments
+.footnote[*Source: [[13]](#references-2)*]
+]
 
 ---
 
@@ -1000,9 +986,6 @@ name: references
 [6]: **Little, R. J./Rubin, D. B. (2019):** Statistical Analysis with Missing Data. 3rd edition. John Wiley & Sons: Hoboken 2019.
 
 [7]: **Anderson, R. (2008):** Modern Methods for Robust Regression. SAGE Publications: Thousan Oaks et al. 2008.
-
-???
-comments
 
 ---
 
@@ -1031,8 +1014,3 @@ name: references-2
 **Kuhn, M./Johnson, K. (2013):** Applied Predictive Modeling. Chapter 3 (Data Pre-processing). Springer: New York 2013.
 
 **Hastie, T./Tibshirani, R./Friedman, J. (2017):** The Elements of Statistical Learning: Data Mining, Inference, and Prediction. Chapter 9.6 (Missing Data). 2nd edition, 12th printing with corrections. Springer: 2017. URL: https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12.pdf.
-
-???
-convert online presentation to pdf:
-
-docker run --rm -t -v %cd%/desktop/l09_desktop/workshops/03_feature_engineering/slides:/slides astefanutti/decktape https://simonschoe.github.io/Feature-Engineering/#1 index.pdf
