@@ -15,7 +15,7 @@ class: left, middle, inverse, title-slide
 ## Feature Engineering
 ### Simon Schölzel
 ### <em>Research Team Berens</em>
-### 2020-08-20 (updated: 2020-11-13)
+### 2020-08-20 (updated: 2020-11-22)
 
 ---
 
@@ -49,9 +49,6 @@ name: agenda
 6.2 Filter and Wrapper Methods
   
 **7 Outlook**
-  
-???
-comment
 
 ---
 
@@ -66,9 +63,6 @@ More specifically, after this workshop you will
 - be aware of the concept of data leakage and how to prevent it, and&lt;br&gt;&lt;br&gt;
 - have a good overview of the different approaches to feature selection.
 
-???
-comments
-
 ---
 
 ## 2 The Generic Machine Learning Pipeline
@@ -78,6 +72,9 @@ comments
 &lt;img src="https://d33wubrfki0l68.cloudfront.net/571b056757d68e6df81a3e3853f54d3c76ad6efc/32d37/diagrams/data-science.png" width="90%" height="90%" style="display: block; margin: auto;" /&gt;
 
 .footnote[*Source: see workshop on ["Introduction to the Tidyverse"](https://simonschoe.github.io/introduction-to-the-tidyverse/#8)*]
+
+???
+day-to-day data science workflow
 
 ---
 
@@ -111,14 +108,14 @@ comments
 - data acquisition: collect data
 - data generation: even generate synthetic data
 - data selection: select relevant data sources
-- data integration: integrate selected data sources
+- data integration: integrate selected data sources (join/merge)
 2
 - data profiling: categorize content and structure, i.e. generate metadata (data type, min, max, average)
 - data validation: learn about data errors
 3
 - clean and transform data (usually most time-consuming step -&gt; also most critical due to gigo-principle), e.g., missing value and outlier handling
 4
-- data split into training, validation, and test datasets
+- data partitioning and resampling: training, validation, and test datasets
 5
 - feature engineering
 - model estimation
@@ -127,7 +124,7 @@ comments
 7
 - exporting the model to be implementable in a business context (i.e. as part of desktop or mobile application)
 8
-- you feed the model into a production environment so that it becomes part of your daily operations (usabale by the end-user)
+- you feed the model into a production environment so that it becomes part of your daily operations (usable by the end-user)
 9
 - continuous supervision of the model performance based on unseen data (look for indications that re-training is required in case of data drift)
 - **Data Drift:** the test data distribution changes -&gt; model performance degrades without adjustments! -&gt; use new data to retrain the model
@@ -143,8 +140,8 @@ Most machine learning models require the data to be of a certain shape. That is,
  &lt;thead&gt;
   &lt;tr&gt;
    &lt;th style="text-align:left;"&gt; Pertubation &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; Robust Methods &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; Sensitive Methods &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Robust methods &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Sensitive methods &lt;/th&gt;
   &lt;/tr&gt;
  &lt;/thead&gt;
 &lt;tbody&gt;
@@ -161,7 +158,7 @@ Most machine learning models require the data to be of a certain shape. That is,
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Outliers, i.e. extreme data points &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; Trees-based methods, robust regression &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; linear regression &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Linear regression &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Features that contain missing values &lt;/td&gt;
@@ -170,13 +167,13 @@ Most machine learning models require the data to be of a certain shape. That is,
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Multicollinearity among features &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; PLS, PCA, penalized regression &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; PLS, PCA, regularized regression &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; Linear regressions or Naive Bayes &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Irrelevant / uninformative features &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Stepwise selection and penalized regression &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; k-NN (computational cost grow exponentially) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Stepwise selection and regularized regression &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; k-NN (computational costs grow exponentially) &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -191,8 +188,8 @@ Most machine learning models require the data to be of a certain shape. That is,
 
 &lt;br&gt;
 The process of **feature engineering** subsumes several interrelated steps, such as
-- applying transformations to the data (*feature transformation*),
-- creating new features based on preexisting features (*feature extraction*), and
+- applying transformations to the feature set (*feature transformation*),
+- creating new features from existing features (*feature extraction*), and
 - omitting redundant features and retaining informative features (*feature selection*).
 
 Moreover, the process of feature engineering may be performed in a *supervised* (data-driven) or *unsupervised* (theory- or knowledge-based) manner.
@@ -203,6 +200,7 @@ Moreover, the process of feature engineering may be performed in a *supervised* 
 
 **Introductory Example:** Have you ever thought about the numerous ways of representing a date feature (`2020-11-23`)? There are more options than you would think at first glance ...
 &lt;br&gt;&lt;br&gt;&lt;br&gt;
+
 **Option 1:** Number of days since *unix time* (`1970-01-01`)
 
 ```
@@ -247,7 +245,7 @@ If a model requires only numerical data as input, categorical features must be t
 ```
 
 .footnote[
-*Note: If your `lm` includes an intercept and you generate `\(C\)` dummies, one for each factor level, your final model is overdetermined, i.e. the intercept can always be computed as a linear combination of the `\(C\)` dummies (adding up to one). In this case the OLS algorithm may fail as your feature matrix is not invertible.*
+*Note: If your linear model includes an intercept and you generate `\(C\)` dummies, one for each factor level, your final model is overdetermined, i.e. the intercept can always be computed as a linear combination of the `\(C\)` dummies (adding up to one). In this case the OLS algorithm may fail as your feature matrix is not invertible.*
 ]
 
 ???
@@ -266,7 +264,7 @@ In the case of ordered factor levels (e.g., `low`, `medium` and `high`), we may 
 
 --
 
-**Linear** (**quadratic**) **polynomial contrast** to represent a linear (quadratic) ordering:
+**Linear** (**quadratic**) **polynomial contrasts:**
 
 ```
 &gt; # A tibble: 3 x 3
@@ -277,7 +275,9 @@ In the case of ordered factor levels (e.g., `low`, `medium` and `high`), we may 
 &gt; 3 high          0.71           0.41
 ```
 
-Theoretically, a polynomial contrast can model most non-linear shapes in the relationship between the response and the categorical feature of up to degree `\(C-1\)`. Yet, in practice the exploration of polynomial contrasts does rarely exceed polynomials of degree 2 [[1]](#references).
+.footnote[
+*Note: Theoretically, a polynomial contrast can model most non-linear shapes in the relationship between the response and the categorical feature of up to degree `\(C-1\)`. Yet, in practice the exploration of polynomial contrasts does rarely exceed polynomials of degree 2 [[1]](#references).*
+]
 
 ---
 
@@ -290,7 +290,7 @@ For these imbalanced features, one-hot encoding becomes computationally demandin
 
 --
 
-**Rule-of-thumb for zv features:** `(#zeros / #ones) &gt; 19` [[1]](#references)
+**Rule-of-thumb for zv features:** `\(\frac{No.\:of\:zeros}{No.\:of\:ones}&gt;19\)` (i.e. relative frequency below 5%) [[1]](#references)
 
 ```
 &gt; # A tibble: 3 x 3
@@ -301,7 +301,7 @@ For these imbalanced features, one-hot encoding becomes computationally demandin
 &gt; 3 Torgersen    52  5.62
 ```
 
-If a feature is considered a near-zero variance feature, a potential remedy is to lump together rare feature levels into an `"other"` category (e.g., using ``forcats::fct_lump()`).
+If a feature is considered a zv feature, a potential remedy is to lump together rare feature levels into an `"other"` category (e.g., using ``forcats::fct_lump()`).
 
 ???
 - one hot encoding introduces high sparsity
@@ -320,7 +320,7 @@ If a feature is considered a near-zero variance feature, a potential remedy is t
 ]
 
 ???
-- Note: Some of these transformations are problematic for zero or negative values. In such cases simple corrections are available to address these issues.
+- Note: Some of these transformations are problematic for zero or negative values (e.g., log of zero). In such cases simple corrections are available to address these issues.
 
 ---
 
@@ -334,8 +334,8 @@ If a feature is considered a near-zero variance feature, a potential remedy is t
 `$$Y^{(\lambda)}=ln(Y) \quad  for \quad {\lambda} = 0$$`
 
 `\(\lambda\)` is considered the so called *power parameter* which can be estimated via maximum likelihood estimation or hyperparameter tuning. Certain values for `\(λ\)` correspond to commonly known transformations:
-- `\(\lambda = 1\)`: no transformation
-- `\(\lambda = 0\)`: log transformation
+- `\(\lambda = \;\;\;1\)`: no transformation
+- `\(\lambda = \;\;\;0\)`: log transformation
 - `\(\lambda = 0.5\)`: square root transformation
 - `\(\lambda = -1\)`: inversion
 
@@ -344,20 +344,29 @@ If a feature is considered a near-zero variance feature, a potential remedy is t
 ## 4.2 Engineering of Numerical Features
 ### 4.2.1 (1:1)-Transformations
 
-`\(\textbf{z}\)`**-normalization:** Modifies the scale of the predictor
+.pull-left[
+`\(\textbf{z}\)`**-normalization:** Modifies the scale of a predictor
 
 `$$Z=\frac{X-\mu } {\sigma}$$`
 
-The `\(z\)`-normalization involves two steps: *centering* (subtracting the mean) and *scaling* (dividing by the standard deviation). Afterwards `\(Z\)` follows a standard normal distribution with  `\(\tilde{}N(0, 1)\)`.
+The `\(z\)`-normalization involves two steps:
+- *centering* (subtracting the mean), and
+- *scaling* (dividing by the standard deviation).
+
+Afterwards `\(Z\)` follows a standard normal distribution: `\(Z\:\tilde{}\:N(0, 1)\)`.
+]
 
 --
 
-&lt;br&gt;&lt;br&gt;
-**min/max-scaling:** Modifies the scale of the predictor
+.pull-right[
+**min/max-scaling:** Modifies the scale of a predictor
 
 `$$X'=  \frac{X - min(X)}{max(X) - min(X))}$$`
 
-Min/max-scaling restricts data points to the `\([0; 1]\)`-interval. A generalization of min/max-scaling is **range scaling** where the data points are projected onto an arbitrary interval.
+Min/max-scaling projects data points onto the `\([0; 1]\)`-interval.
+
+A generalization of min/max-scaling is **range scaling** where the data points are projected onto an arbitrary interval.
+]
 
 ???
 z-transf: makes values harder to interpret
@@ -368,7 +377,7 @@ min/max: These may be relevant for special algorithms that require the data to b
 ## 4.2 Engineering of Numerical Features
 ### 4.2.2 (1:N)-Transformations
 
-**Basis expansion:** Establish non-linear relationships between a predictor and the response by adding polynomials (e.g., quadratic and cubic terms)
+**Basis expansion:** Establishes non-linear relationships between a predictor and the response by adding polynomials (e.g., quadratic and cubic terms)
 
 ```r
 penguins %&gt;% 
@@ -396,9 +405,9 @@ This enables us to specify additive models that account for a potential non-line
 &lt;img src="index_files/figure-html/unnamed-chunk-14-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
-In certain cases, binning helps to reduce complexity of the relationship between `\(X\)` and `\(Y\)` and hence facilitates the interpretation.
+In certain cases, binning helps to reduce complexity in the relationship between `\(X\)` and `\(Y\)` and hence facilitates the interpretation.
 
-However, it should only be used with great care as
+However, it should only be used with caution as
 - it is accompanied by an information loss,
 - it may obscure the relation between `\(X\)` and `\(Y\)`,
 - bins are often assigned subjectively, and
@@ -431,7 +440,8 @@ However, it should only be used with great care as
 ]]
 
 ???
-Discretize data by fitting a tree to it
+- here, indicator of bi- or tri-modal distribution
+- Discretize data by fitting a tree to it
 
 ---
 
@@ -457,7 +467,7 @@ The underlying idea of dimensionality reduction techniques is to extract more in
 
 &gt; An outlier is a datapoint that deviates so much from other observations that one might assume a different underlying sampling mechanism. ~ [Enderlein, G. (1987)](#references)
 
-The removal of outliers must be guided by the employed model and is context-dependent.
+The removal of outliers must be guided by the employed model and is context-dependent:
 - On the one hand, the presence of an outlier can be due to errors in the data collection processes.
 - On the other hand, an outlier can be a very informative and valuable data point.
 
@@ -466,9 +476,9 @@ A good idea is to run the analysis with and without outliers and compare the res
 --
 
 &lt;br&gt;&lt;br&gt;
-📉 **Visual detection techniques:** histograms, scatterplots, boxplots, etc.
+📈 **Visual detection techniques:** histograms, scatterplots, boxplots, etc.
 
-🧮 **Numerical detection techniques:** z-score, interquartile range, Cook's distance
+🧮 **Numerical detection techniques:** `\(z\)`-score, interquartile range, Cook's distance
 
 ---
 
@@ -481,8 +491,8 @@ A good idea is to run the analysis with and without outliers and compare the res
 .pull-right[
 **Boxplots elements:**
 - **Horizontal line:** Median&lt;br&gt;&lt;br&gt;
-- **Box area:** inter-quartile range ( `\(IQR\)` ), corresponds to the `\([Q_{0.25}; Q_{0.75}]\)`-interval&lt;br&gt;&lt;br&gt;
-- **Hinge length:** max. `\(1.5 * IQR\)`&lt;br&gt;&lt;br&gt;
+- **Box area:** Interquartile range ( `\(IQR\)` ), corresponds to the `\([Q_{0.25}; Q_{0.75}]\)`-interval&lt;br&gt;&lt;br&gt;
+- **Hinge length:** Max. `\(1.5 * IQR\)`&lt;br&gt;&lt;br&gt;
 - **Outliers:** Points beyond the hinges
 ]
 
@@ -492,7 +502,7 @@ A good idea is to run the analysis with and without outliers and compare the res
 ---
 
 ## 4.3 Handling of Extreme Values
-### 4.3.2 Outlier Detection 📈
+### 4.3.2 Outlier Detection 📊
 
 .pull-left[
 &lt;img src="index_files/figure-html/unnamed-chunk-18-1.png" width="576" style="display: block; margin: auto;" /&gt;
@@ -535,7 +545,7 @@ A more sophisticated, multidimensional approach goes by the name of **Cook's dis
 - a large residual, i.e. a poor prediction, and
 - high leverage, i.e. extreme feature values.
 
-`$$D_i=\frac{e_i^2}{p*s^2} \left[\frac{h_ii}{(1- h_{ii} )^2}\right]$$`
+`$$D_i=\frac{e_i^2}{p*s^2} \left[\frac{h_{ii}}{(1- h_{ii} )^2}\right]$$`
 
 ]
 .pull-right[
@@ -543,7 +553,7 @@ A more sophisticated, multidimensional approach goes by the name of **Cook's dis
 ]
 
 .footnote[.pull-left[
-*Note: You can find multiple references in the literature with regards to the optimal cutoff threshold for Cook's distance. Commonly, a value of 1 is applied as a threshold for truncation respectively trimming.*
+*Note: You can find numerous references in the literature with regards to the optimal cutoff. Commonly, a value of 1 is applied as a threshold for truncation respectively trimming.*
 ]]
 
 ---
@@ -565,6 +575,9 @@ Finally, also the machine learning community has contributed to novel, data-driv
 
 **Decision rule:** Relatively short (long) path length indicate outliers (normal samples). Relatively homogeneous path length across all samples suggest the absence of outliers.
 
+???
+skip
+
 ---
 
 ## 4.4 Handling of Missing Values
@@ -573,10 +586,10 @@ Finally, also the machine learning community has contributed to novel, data-driv
 Some methods react highly sensitive to the presence of missing values (`NA`). That is, in certain cases `R` might not even be able to fit a model in the presence of missing values.
 
 **Types of missing values:**
-- **Structural `NA`:** Relate to missing values that are structurally motivated (e.g., number of births per man)&lt;br&gt;&lt;br&gt;
-- **Random `NA`:** Relate to missing values that are due to randomness in the data generating process
+- **Structural `NA`:** Relate to missing values that are structurally motivated (e.g., number of births per man).&lt;br&gt;&lt;br&gt;
+- **Random `NA`:** Relate to missing values that are due to randomness in the data generating process.
   - *Missing completely at random (MCAR):* The likelihood of `NA` is independent of the variable itself as well as any other variable in the data set. [[6]](#references)
-  - *Missing at random (MAR):* The likelihood of `NA` is independent of the variable itself, but can be  explained by other variables in the data set. [[6]](#references)&lt;br&gt;&lt;br&gt;
+  - *Missing at random (MAR):* The likelihood of `NA` is independent of the variable itself, but can be explained by other variables in the data set. [[6]](#references)&lt;br&gt;&lt;br&gt;
 - **Non-random `NA`:** The likelihood of `NA` depends only on the variable itself (e.g., negative customer reviews). This type of `NA` is considered informative and referred to as *not missing at random (NMAR)*. [[6]](#references)
 
 ???
@@ -590,7 +603,7 @@ Often, it is really non-trivial to come by the reason of an NA:
 ### 4.4.2 Missing Value Detection
 
 .pull-left[
-**Missing value heatmap:** 💹
+**Missing value heatmap:** 📈
 &lt;img src="index_files/figure-html/unnamed-chunk-21-1.png" width="576" style="display: block; margin: auto auto auto 0;" /&gt;
 ]
 .pull-right[
@@ -598,14 +611,15 @@ Often, it is really non-trivial to come by the reason of an NA:
 
 ```r
 penguins %&gt;% 
-  purrr::map_dfc(., ~sum(is.na(.)))
+  purrr::map_dfc(., ~ sum(is.na(.)))
 ```
 **Filter for missing values:** 🧮
 
 ```r
 penguins %&gt;% 
   dplyr::filter(
-    rowSums(across(everything(), ~ is.na(.))) &gt; 0)
+    rowSums(across(everything(), ~ is.na(.))) &gt; 0
+  )
 ```
 ]
 
@@ -636,8 +650,9 @@ comment on removal: usually you would want to keep as many observations as possi
 
 **`NA` as categorical predictor:** Create a binary feature that indicates the presence of a `NA`. This way it can be assessed whether the `NA`-dummy is predictive of the response. However, as the true data is missing in the first place, this approach will not lead to any explanation of why this relationship may be informative.
 
-???
-assumption here: you have no option of acquiring the missing values ex post. that should always be the first approach if it affordable.
+.footnote[
+*Note: These approaches assume that there is no option of acquiring the missing values ex post (which should always be you first priority if affordable).*
+]
 
 ---
 
@@ -645,11 +660,11 @@ assumption here: you have no option of acquiring the missing values ex post. tha
 
 **Intuition:** Pre-processing techniques, such as feature transformation (e.g., `\(z\)`-normalization), outlier correction (e.g., winsorization) or missing values handling (e.g., mean-imputation), depend on the concrete train-test-split (i.e. the training observations) as part of the validation set or cross-validation approach:
 
-- `\(z\)`*-normalization:* The mean and standard deviation depends on your data set.&lt;br&gt;&lt;br&gt;
+- `\(z\)`*-normalization:* The mean and standard deviation depend on your data set.&lt;br&gt;&lt;br&gt;
 - *Winsorization:* The definition of an outlier is relative to the other observations in your data set.&lt;br&gt;&lt;br&gt;
 - *Mean-imputation:* The estimated mean depends on the concrete predictor values in your data.
 
-Hence, these approaches must be incorporated in the modeling pipeline by estimating them on the training data and then applying them to the unseen test data.
+Hence, these approaches must be incorporated into the modeling pipeline by estimating them on the training data and then applying them to the unseen test data.
 
 ---
 
@@ -665,7 +680,7 @@ A violation of this practice is called **data leakage**:
 &lt;img src="./img/leakage-meme.jpg" width="70%" style="display: block; margin: auto;" /&gt;
 ]
 .footnote[
-*Note: Revisit online lecture 5 on resampling methods (in particular slides 17-21). [[8]](#references-2) and [[9]](#references-2) are also great resources for getting an intuitive understanding of data leakage.*
+*Note: Revisit online lecture 5 on resampling methods (in particular slides 17-21). This [blog post](https://machinelearningmastery.com/data-leakage-machine-learning/) and [podcast episode](https://www.youtube.com/watch?v=dI5oGNTi6Ys) are also great resources for getting an intuitive understanding of data leakage.*
 
 *Source: [deeplearning.ai](https://www.linkedin.com/posts/deeplearningai_reminder-dont-train-on-test-data-creds-activity-6647926795935068160-NhSd).*
 ]
@@ -697,11 +712,11 @@ In general, there is little theory on how to best engineer your features. Thus, 
 ## 6 Feature Selection
 ### 6.1 Intrinsic Methods 📦
 
-Intrinsic methods provide embedded feature selection capabilities. This broadly refers to all methods that have some type of regularization built-in, such as Lasso regression or pruned decision trees.
+Intrinsic methods provide inherent feature selection capabilities. This broadly refers to all methods that have some type of regularization built-in, such as Lasso regression or pruned decision trees.
 
 - Feature selection is directly linked to the objective function (e.g., RMSE or misclassification error). 
 - Intrinsic methods are model dependent and usually do not apply to other methods in the same way.
-- Oftentimes *greedy* in their search for an optimal solution.
+- Oftentimes, they are *greedy* in their search for an optimal solution.
 
 --
 ___
@@ -710,7 +725,7 @@ ___
 &lt;br&gt;
 **Greedy algorithms:** Search for the best immediate solution without re-evaluating past choices. Greedy algorithms usually find *local optima* (e.g., stepwise subset selection).
 
-**Non-greedy algorithm:** Search for the best overall solution by re-evaluating past choices. Non-greedy algorithms are able to find *global optima* (e.g., genetic algorithms or and simulated annealing).
+**Non-greedy algorithm:** Search for the best overall solution by re-evaluating past choices. Non-greedy algorithms are better suited for finding *global optima* (e.g., genetic algorithms or simulated annealing).
 
 ???
 non-greedy: can move in unfavorable direction first, if it turns out to be beneficial later
@@ -721,7 +736,7 @@ non-greedy: can move in unfavorable direction first, if it turns out to be benef
 ### 6.2 Filter Methods 🔎 and Wrapper Methods 🔄
 
 .pull-left[
-**Filter methods** [[10]](#references-2) discard features based on domain knowledge or statistical indicators, e.g., correlations, chi-square scores, `\(p\)`-values or odds-ratios. These methods are
+**Filter methods** [[8]](#references) discard features based on domain knowledge or statistical indicators, e.g., correlations, chi-square scores, `\(p\)`-values or odds-ratios. These methods are
 - rather *heuristic* by nature,
 - commonly applied once,
 - model-agnostic (i.e. model-independent),
@@ -732,7 +747,7 @@ non-greedy: can move in unfavorable direction first, if it turns out to be benef
 --
 
 .pull-right[
-**Wrapper methods** [[10]](#references-2) wrap the process of model training and feature selection into a for-loop and successively discard irrelevant features. These methods are
+**Wrapper methods** [[8]](#references) wrap the process of model training and feature selection into a for-loop and successively discard irrelevant features. These methods are
 - rather *model-driven* by nature,
 - iterative search procedures,
 - based on multivariate examinations of the feature space,
@@ -757,7 +772,7 @@ summary:
 
 &lt;img src="./img/representation-learning-images.PNG" style="display: block; margin: auto;" /&gt;
 
-.footnote[*Source: [[11]](#references)*]
+.footnote[*Source: Article on [Distill](https://distill.pub/2017/feature-visualization/) by Chris Olah.*]
 
 ---
 
@@ -767,12 +782,12 @@ summary:
 .pull-left[
 &lt;img src="./img/representation-learning-word2vec.PNG" width="80%" height="80%" style="display: block; margin: auto;" /&gt;
 
-.footnote[*Source: [[12]](#references-2)*]
+.footnote[*Source: [[9]](#references-2)*]
 ]
 .pull-right[
 &lt;img src="./img/representation-learning-doc-embeddings.PNG" width="80%" height="80%" style="display: block; margin: auto;" /&gt;
 
-.footnote[*Source: [[13]](#references-2)*]
+.footnote[*Source: [[10]](#references-2)*]
 ]
 
 ---
@@ -795,25 +810,17 @@ name: references
 
 [7]: **Anderson, R. (2008):** Modern Methods for Robust Regression. SAGE Publications: Thousan Oaks et al. 2008.
 
+[8]: **Kohavi, R./George, H. J. (1997):** Wrappers for Feature Subset Selection. Artificial intelligence Vol. 97, 1997, No. 1-2, pp. 273-324.
+
 ---
 
 name: references-2
 
 ## References
 
-[8]: **Brownlee, J. (2016):** Data Leakage in Machine Learning. Machine Learning Mastery 2016-08-02 (updated 2020-08-15). URL: https://machinelearningmastery.com/data-leakage-machine-learning/.
+[9]: **Mikolov, T., et al. (2013):** Distributed Representations of Words and Phrases and Their Compositionality. NIPS 2013. URL: http://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf.
 
-[9]: **Data Skeptic (2017):** [MINI] Leakage. Data Skeptic Podcast 2017-05-10. URL: https://www.youtube.com/watch?v=dI5oGNTi6Ys.
-
-[10]: **Kohavi, R./George, H. J. (1997):** Wrappers for Feature Subset Selection. Artificial intelligence Vol. 97, 1997, No. 1-2, pp. 273-324.
-
-[11]: **Olah, C./Mordvintsev, A./Schubert, L. (2017):** Feature Visualization: How Neural Networks Build up Their Understanding of Images. URL: https://distill.pub/2017/feature-visualization/
-
-[12]: **Mikolov, T., et al. (2013):** Distributed Representations of Words and Phrases and Their Compositionality. NIPS 2013. URL: http://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf.
-
-[13]: **Dai, A. M./Olah, C./Le, Q. V (2015):** Document Embedding with Paragraph Vectors. arXiv Working Paper 2015-07-29. URL: https://arxiv.org/pdf/1507.07998.pdf.
-
----
+[10]: **Dai, A. M./Olah, C./Le, Q. V (2015):** Document Embedding with Paragraph Vectors. arXiv Working Paper 2015-07-29. URL: https://arxiv.org/pdf/1507.07998.pdf.
 
 ## Further Resources
 
