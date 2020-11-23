@@ -3,7 +3,7 @@ title: "Machine Learning in R:<br/>Workshop Series"
 subtitle: "Feature Engineering"
 author: "Simon Schölzel"
 institute: "*Research Team Berens*"
-date: "2020-08-20 (updated: `r Sys.Date()`)"
+date: "2020-11-23 (updated: `r Sys.Date()`)"
 
 output:
   xaringan::moon_reader:
@@ -117,7 +117,7 @@ knitr::include_graphics("https://ml-ops.org/img/ml-engineering.jpg")
 >1 Data ingestion  
 2 Data exploration (EDA)  
 3 Data wrangling  
-4 Data splitting / resampling
+4 Data partitioning / resampling
 
 **.red[ML Pipeline]**
 
@@ -139,25 +139,34 @@ knitr::include_graphics("https://ml-ops.org/img/ml-engineering.jpg")
 - data generation: even generate synthetic data
 - data selection: select relevant data sources
 - data integration: integrate selected data sources (join/merge)
+
 2
 - data profiling: categorize content and structure, i.e. generate metadata (data type, min, max, average)
 - data validation: learn about data errors
+
 3
 - clean and transform data (usually most time-consuming step -> also most critical due to gigo-principle), e.g., missing value and outlier handling
+
 4
 - data partitioning and resampling: training, validation, and test datasets
+
 5
 - feature engineering
 - model estimation
 - hyperparameter tuning
+
 6 
+
 7
 - exporting the model to be implementable in a business context (i.e. as part of desktop or mobile application)
+
 8
 - you feed the model into a production environment so that it becomes part of your daily operations (usable by the end-user)
+
 9
 - continuous supervision of the model performance based on unseen data (look for indications that re-training is required in case of data drift)
 - **Data Drift:** the test data distribution changes -> model performance degrades without adjustments! -> use new data to retrain the model
+
 10
 - logging of queries and results in a logfile to be usable for re-training
 
@@ -183,7 +192,7 @@ tibble(
     "PLS, PCA, regularized regression",
     "Stepwise selection and regularized regression"),
   'Sensitive methods' = c(
-    "Distance-based learners (e.g., SVM or kNN)",
+    "Distance-based learners (e.g., SVM or k-NN)",
     "Parametric learners which assume normality (e.g., linear regression)",
     "Linear regression",
     "C4.5 decision trees or certain RF implementations",
@@ -192,6 +201,9 @@ tibble(
 ) %>% 
   knitr::kable(format = "html")
 ```
+
+???
+- free lunch theorem
 
 ---
 
@@ -222,7 +234,7 @@ difftime(as.Date("2020-11-23"), as.Date("1970-01-01"), units="days")
 ```
 **Option 2:** Year, month and day of the week feature
 ```{r, echo=F}
-print(c(lubridate::year("2020-11-23"), lubridate::month("2020-11-23"), lubridate::wday("2020-11-23")))
+print(c(lubridate::year("2020-11-23"), lubridate::month("2020-11-23"), lubridate::wday("2020-11-23", week_start = getOption("lubridate.week.start", 1))))
 ```
 **Option 3:** Day of the year feature
 ```{r, echo=F}
@@ -249,6 +261,7 @@ If a model requires only numerical data as input, categorical features must be t
 penguins %>% 
   distinct(species) %>% 
   mutate(
+    intercept = rep(1, 3),
     species_gentoo = if_else(species == "Gentoo", 1, 0),
     species_chinstrap = if_else(species == "Chinstrap", 1, 0)
   )
@@ -305,7 +318,7 @@ penguins %>%
   mutate(ratio = (sum(n) - n) / n)
 ```
 
-If a feature is considered a zv feature, a potential remedy is to lump together rare feature levels into an `"other"` category (e.g., using ``forcats::fct_lump()`).
+If a feature is considered a zv feature, a potential remedy is to lump together rare feature levels into an `"other"` category (e.g., using `forcats::fct_lump()`).
 
 ???
 - one hot encoding introduces high sparsity
@@ -397,7 +410,7 @@ Afterwards $Z$ follows a standard normal distribution: $Z\:\tilde{}\:N(0, 1)$.
 --
 
 .pull-right[
-**min/max-scaling:** Modifies the scale of a predictor
+**Min/max-scaling:** Modifies the scale of a predictor
 
 $$X'=  \frac{X - min(X)}{max(X) - min(X))}$$
 
@@ -498,9 +511,9 @@ penguins %>%
 ```
 ]
 .pull-right[
-In certain cases, binning helps to reduce complexity of the relationship between $X$ and $Y$ and hence facilitates the interpretation.
+In certain cases, binning helps to reduce complexity in the relationship between $X$ and $Y$ and hence facilitates the interpretation.
 
-However, it should only be used with great care as
+However, it should only be used with caution as
 - it is accompanied by an information loss,
 - it may obscure the relation between $X$ and $Y$,
 - bins are often assigned subjectively, and
@@ -660,7 +673,7 @@ Some prominent techniques for pinpointing the truncation respectively trimming t
 - **Winsorizing:** correct if value exceeds/undercuts a certain percentile, e.g., 95% (similar to $z$-score)
 
 ???
-maybe even tabulating the data and looking at the min max values of the feature
+- -1.96 till 1.96 sd of the mean: 95% of the data
 
 ---
 
@@ -695,11 +708,9 @@ penguins_pred %>%
       data = penguins_pred %>% slice_max(x, n = 3),
       aes(color = "High leverage"), size = 4, alpha = .5) + 
     geom_point(
-      data = penguins_pred %>% slice_min(x, n = 3),
-      aes(color = "High leverage"), size = 4, alpha = .5) + 
-    geom_point(
       data = penguins_pred %>% slice_max(resid, n = 5),
       aes(color = "Large residual"), size = 4, alpha = .5) + 
+    geom_vline(xintercept = mean(penguins_pred$x), lty = "dashed") +
     geom_smooth(formula = y ~ x, method = "lm") +
     labs(
       x = "Body mass [grams]",
@@ -840,7 +851,7 @@ comment on removal: usually you would want to keep as many observations as possi
 
 ## 5 Excursus: Data Leakage `r emo::ji("droplet")`
 
-**Intuition:** Pre-processing techniques, such as feature transformation (e.g., $z$-normalization), outlier correction (e.g., winsorization) or missing values handling (e.g., mean-imputation), depend on the concrete train-test-split (i.e. the training observations) as part of the validation set or cross-validation approach:
+**Intuition:** Feature engineering techniques, such as transformations (e.g., $z$-normalization), outlier correction (e.g., winsorization) or missing values handling (e.g., mean-imputation), depend on the concrete train-test-split (i.e. the training observations) as part of the validation set or cross-validation approach:
 
 - $z$*-normalization:* The mean and standard deviation depend on your data set.<br><br>
 - *Winsorization:* The definition of an outlier is relative to the other observations in your data set.<br><br>
@@ -878,7 +889,7 @@ In general, there is little theory on how to best engineer your features. Thus, 
 --
 
 **Reasons for feature selection:**
-- Parsimonious models (so-called *white box models*) are easier to interpret.
+- Parsimonious models are easier to interpret.
 - A reduced set of features increases training speed and lowers the cost of data collection and storage.
 - Feature selection helps to tackle the problem of *overfitting* and reduces the dimensionality.
 - Certain models react highly sensitive to correlated predictors (e.g., linear regressions).

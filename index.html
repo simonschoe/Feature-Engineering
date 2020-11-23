@@ -15,7 +15,7 @@ class: left, middle, inverse, title-slide
 ## Feature Engineering
 ### Simon Schölzel
 ### <em>Research Team Berens</em>
-### 2020-08-20 (updated: 2020-11-22)
+### 2020-11-23 (updated: 2020-11-23)
 
 ---
 
@@ -87,7 +87,7 @@ day-to-day data science workflow
 &gt;1 Data ingestion  
 2 Data exploration (EDA)  
 3 Data wrangling  
-4 Data splitting / resampling
+4 Data partitioning / resampling
 
 **.red[ML Pipeline]**
 
@@ -109,25 +109,34 @@ day-to-day data science workflow
 - data generation: even generate synthetic data
 - data selection: select relevant data sources
 - data integration: integrate selected data sources (join/merge)
+
 2
 - data profiling: categorize content and structure, i.e. generate metadata (data type, min, max, average)
 - data validation: learn about data errors
+
 3
 - clean and transform data (usually most time-consuming step -&gt; also most critical due to gigo-principle), e.g., missing value and outlier handling
+
 4
 - data partitioning and resampling: training, validation, and test datasets
+
 5
 - feature engineering
 - model estimation
 - hyperparameter tuning
+
 6 
+
 7
 - exporting the model to be implementable in a business context (i.e. as part of desktop or mobile application)
+
 8
 - you feed the model into a production environment so that it becomes part of your daily operations (usable by the end-user)
+
 9
 - continuous supervision of the model performance based on unseen data (look for indications that re-training is required in case of data drift)
 - **Data Drift:** the test data distribution changes -&gt; model performance degrades without adjustments! -&gt; use new data to retrain the model
+
 10
 - logging of queries and results in a logfile to be usable for re-training
 
@@ -148,7 +157,7 @@ Most machine learning models require the data to be of a certain shape. That is,
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Differently scaled features &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; Linear regression (scale absorbed by coefficients) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Distance-based learners (e.g., SVM or kNN) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Distance-based learners (e.g., SVM or k-NN) &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Highly skewed features &lt;/td&gt;
@@ -177,6 +186,9 @@ Most machine learning models require the data to be of a certain shape. That is,
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
+
+???
+- free lunch theorem
 
 ---
 
@@ -209,7 +221,7 @@ Moreover, the process of feature engineering may be performed in a *supervised* 
 **Option 2:** Year, month and day of the week feature
 
 ```
-&gt; [1] 2020   11    2
+&gt; [1] 2020   11    1
 ```
 **Option 3:** Day of the year feature
 
@@ -236,12 +248,12 @@ If a model requires only numerical data as input, categorical features must be t
 
 
 ```
-&gt; # A tibble: 3 x 3
-&gt;   species   species_gentoo species_chinstrap
-&gt;   &lt;fct&gt;              &lt;dbl&gt;             &lt;dbl&gt;
-&gt; 1 Adelie                 0                 0
-&gt; 2 Gentoo                 1                 0
-&gt; 3 Chinstrap              0                 1
+&gt; # A tibble: 3 x 4
+&gt;   species   intercept species_gentoo species_chinstrap
+&gt;   &lt;fct&gt;         &lt;dbl&gt;          &lt;dbl&gt;             &lt;dbl&gt;
+&gt; 1 Adelie            1              0                 0
+&gt; 2 Gentoo            1              1                 0
+&gt; 3 Chinstrap         1              0                 1
 ```
 
 .footnote[
@@ -301,7 +313,7 @@ For these imbalanced features, one-hot encoding becomes computationally demandin
 &gt; 3 Torgersen    52  5.62
 ```
 
-If a feature is considered a zv feature, a potential remedy is to lump together rare feature levels into an `"other"` category (e.g., using ``forcats::fct_lump()`).
+If a feature is considered a zv feature, a potential remedy is to lump together rare feature levels into an `"other"` category (e.g., using `forcats::fct_lump()`).
 
 ???
 - one hot encoding introduces high sparsity
@@ -313,10 +325,10 @@ If a feature is considered a zv feature, a potential remedy is to lump together 
 
 **Log-transformation** and **inversion**: Resolves skewness and shifts the distribution closer to a Gaussian
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-11-1.png" width="576" style="float:left; padding:10px" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-22-1.png" width="576" style="float:left; padding:10px" /&gt;
 ]
 .pull-right[
-&lt;img src="index_files/figure-html/unnamed-chunk-12-1.png" width="576" style="float:left; padding:10px" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-23-1.png" width="576" style="float:left; padding:10px" /&gt;
 ]
 
 ???
@@ -359,7 +371,7 @@ Afterwards `\(Z\)` follows a standard normal distribution: `\(Z\:\tilde{}\:N(0, 
 --
 
 .pull-right[
-**min/max-scaling:** Modifies the scale of a predictor
+**Min/max-scaling:** Modifies the scale of a predictor
 
 `$$X'=  \frac{X - min(X)}{max(X) - min(X))}$$`
 
@@ -402,7 +414,7 @@ This enables us to specify additive models that account for a potential non-line
 
 **Discretization:** Reduces a numeric feature to a set of categorical features
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-14-1.png" width="576" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-25-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 In certain cases, binning helps to reduce complexity in the relationship between `\(X\)` and `\(Y\)` and hence facilitates the interpretation.
@@ -424,12 +436,12 @@ However, it should only be used with caution as
 
 **Discretization:** Reduces a numeric feature to a set of categorical features
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-15-1.png" width="576" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-26-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
-In certain cases, binning helps to reduce complexity of the relationship between `\(X\)` and `\(Y\)` and hence facilitates the interpretation.
+In certain cases, binning helps to reduce complexity in the relationship between `\(X\)` and `\(Y\)` and hence facilitates the interpretation.
 
-However, it should only be used with great care as
+However, it should only be used with caution as
 - it is accompanied by an information loss,
 - it may obscure the relation between `\(X\)` and `\(Y\)`,
 - bins are often assigned subjectively, and
@@ -450,7 +462,7 @@ However, it should only be used with great care as
 
 **Dimensionality reduction techniques:** Generate uncorrelated predictors to resolve multicollinearity
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-16-1.png" width="576" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-27-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 The underlying idea of dimensionality reduction techniques is to extract more informative features from the existing feature set. Usually, this comes at the expense of interpretability.
@@ -486,7 +498,7 @@ A good idea is to run the analysis with and without outliers and compare the res
 ### 4.3.2 Outlier Detection 📈
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-17-1.png" width="576" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-28-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 **Boxplots elements:**
@@ -502,10 +514,10 @@ A good idea is to run the analysis with and without outliers and compare the res
 ---
 
 ## 4.3 Handling of Extreme Values
-### 4.3.2 Outlier Detection 📊
+### 4.3.2 Outlier Detection 💹
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-18-1.png" width="576" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-29-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 **Scatterplots with marginal densities:** Convenient tool for identifying outliers in two dimensions
@@ -533,7 +545,7 @@ Some prominent techniques for pinpointing the truncation respectively trimming t
 - **Winsorizing:** correct if value exceeds/undercuts a certain percentile, e.g., 95% (similar to `\(z\)`-score)
 
 ???
-maybe even tabulating the data and looking at the min max values of the feature
+- -1.96 till 1.96 sd of the mean: 95% of the data
 
 ---
 
@@ -549,7 +561,7 @@ A more sophisticated, multidimensional approach goes by the name of **Cook's dis
 
 ]
 .pull-right[
-&lt;img src="index_files/figure-html/unnamed-chunk-19-1.png" width="576" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-30-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 
 .footnote[.pull-left[
@@ -603,8 +615,8 @@ Often, it is really non-trivial to come by the reason of an NA:
 ### 4.4.2 Missing Value Detection
 
 .pull-left[
-**Missing value heatmap:** 📈
-&lt;img src="index_files/figure-html/unnamed-chunk-21-1.png" width="576" style="display: block; margin: auto auto auto 0;" /&gt;
+**Missing value heatmap:** 📉
+&lt;img src="index_files/figure-html/unnamed-chunk-32-1.png" width="576" style="display: block; margin: auto auto auto 0;" /&gt;
 ]
 .pull-right[
 **Check number of `NA` per feature:** 🧮
@@ -658,7 +670,7 @@ comment on removal: usually you would want to keep as many observations as possi
 
 ## 5 Excursus: Data Leakage 💧
 
-**Intuition:** Pre-processing techniques, such as feature transformation (e.g., `\(z\)`-normalization), outlier correction (e.g., winsorization) or missing values handling (e.g., mean-imputation), depend on the concrete train-test-split (i.e. the training observations) as part of the validation set or cross-validation approach:
+**Intuition:** Feature engineering techniques, such as transformations (e.g., `\(z\)`-normalization), outlier correction (e.g., winsorization) or missing values handling (e.g., mean-imputation), depend on the concrete train-test-split (i.e. the training observations) as part of the validation set or cross-validation approach:
 
 - `\(z\)`*-normalization:* The mean and standard deviation depend on your data set.&lt;br&gt;&lt;br&gt;
 - *Winsorization:* The definition of an outlier is relative to the other observations in your data set.&lt;br&gt;&lt;br&gt;
@@ -694,7 +706,7 @@ In general, there is little theory on how to best engineer your features. Thus, 
 --
 
 **Reasons for feature selection:**
-- Parsimonious models (so-called *white box models*) are easier to interpret.
+- Parsimonious models are easier to interpret.
 - A reduced set of features increases training speed and lowers the cost of data collection and storage.
 - Feature selection helps to tackle the problem of *overfitting* and reduces the dimensionality.
 - Certain models react highly sensitive to correlated predictors (e.g., linear regressions).
