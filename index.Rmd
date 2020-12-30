@@ -95,7 +95,7 @@ More specifically, after this workshop you will
 
 <br><br>
 
-```{r, echo=F, out.width='90%', out.height='90%', fig.align='center'}
+```{r, echo=F, out.width='70%', out.height='70%', fig.align='center'}
 knitr::include_graphics("https://d33wubrfki0l68.cloudfront.net/571b056757d68e6df81a3e3853f54d3c76ad6efc/32d37/diagrams/data-science.png")
 ```
 
@@ -325,6 +325,13 @@ If a feature is considered a zv feature, a potential remedy is to lump together 
 
 ---
 
+layout: false
+class: center, middle
+
+# 5-Minute Break<br><br>`r emo::ji("coffee")` `r emo::ji("doughnut")`
+
+---
+
 ## 4.2 Engineering of Numerical Features
 ### 4.2.1 (1:1)-Transformations
 
@@ -404,7 +411,7 @@ The $z$-normalization involves two steps:
 - *centering* (subtracting the mean), and
 - *scaling* (dividing by the standard deviation).
 
-Afterwards $Z$ follows a standard normal distribution: $Z\:\tilde{}\:N(0, 1)$.
+Afterwards, the distribution of $Z$ is characterized by a mean of 0 and a standard deviation of 1. Hence, if $Z$ is normally distributed, it will be standard normally distribution subsequent to the normalization step.
 ]
 
 --
@@ -412,7 +419,7 @@ Afterwards $Z$ follows a standard normal distribution: $Z\:\tilde{}\:N(0, 1)$.
 .pull-right[
 **Min/max-scaling:** Modifies the scale of a predictor
 
-$$X'=  \frac{X - min(X)}{max(X) - min(X))}$$
+$$X'=  \frac{X - min(X)}{max(X) - min(X)}$$
 
 Min/max-scaling projects data points onto the $[0; 1]$-interval.
 

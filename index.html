@@ -15,7 +15,7 @@ class: left, middle, inverse, title-slide
 ## Feature Engineering
 ### Simon Schölzel
 ### <em>Research Team Berens</em>
-### 2020-11-23 (updated: 2020-11-23)
+### 2020-11-23 (updated: 2020-12-30)
 
 ---
 
@@ -69,7 +69,7 @@ More specifically, after this workshop you will
 
 &lt;br&gt;&lt;br&gt;
 
-&lt;img src="https://d33wubrfki0l68.cloudfront.net/571b056757d68e6df81a3e3853f54d3c76ad6efc/32d37/diagrams/data-science.png" width="90%" height="90%" style="display: block; margin: auto;" /&gt;
+&lt;img src="https://d33wubrfki0l68.cloudfront.net/571b056757d68e6df81a3e3853f54d3c76ad6efc/32d37/diagrams/data-science.png" width="70%" height="70%" style="display: block; margin: auto;" /&gt;
 
 .footnote[*Source: see workshop on ["Introduction to the Tidyverse"](https://simonschoe.github.io/introduction-to-the-tidyverse/#8)*]
 
@@ -320,15 +320,22 @@ If a feature is considered a zv feature, a potential remedy is to lump together 
 
 ---
 
+layout: false
+class: center, middle
+
+# 5-Minute Break&lt;br&gt;&lt;br&gt;☕ 🍩
+
+---
+
 ## 4.2 Engineering of Numerical Features
 ### 4.2.1 (1:1)-Transformations
 
 **Log-transformation** and **inversion**: Resolves skewness and shifts the distribution closer to a Gaussian
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-22-1.png" width="576" style="float:left; padding:10px" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-11-1.png" width="576" style="float:left; padding:10px" /&gt;
 ]
 .pull-right[
-&lt;img src="index_files/figure-html/unnamed-chunk-23-1.png" width="576" style="float:left; padding:10px" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-12-1.png" width="576" style="float:left; padding:10px" /&gt;
 ]
 
 ???
@@ -365,7 +372,7 @@ The `\(z\)`-normalization involves two steps:
 - *centering* (subtracting the mean), and
 - *scaling* (dividing by the standard deviation).
 
-Afterwards `\(Z\)` follows a standard normal distribution: `\(Z\:\tilde{}\:N(0, 1)\)`.
+Afterwards, the distribution of `\(Z\)` is characterized by a mean of 0 and a standard deviation of 1. Hence, if `\(Z\)` is normally distributed, it will be standard normally distribution subsequent to the normalization step.
 ]
 
 --
@@ -373,7 +380,7 @@ Afterwards `\(Z\)` follows a standard normal distribution: `\(Z\:\tilde{}\:N(0, 
 .pull-right[
 **Min/max-scaling:** Modifies the scale of a predictor
 
-`$$X'=  \frac{X - min(X)}{max(X) - min(X))}$$`
+`$$X'=  \frac{X - min(X)}{max(X) - min(X)}$$`
 
 Min/max-scaling projects data points onto the `\([0; 1]\)`-interval.
 
@@ -414,7 +421,7 @@ This enables us to specify additive models that account for a potential non-line
 
 **Discretization:** Reduces a numeric feature to a set of categorical features
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-25-1.png" width="576" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-14-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 In certain cases, binning helps to reduce complexity in the relationship between `\(X\)` and `\(Y\)` and hence facilitates the interpretation.
@@ -436,7 +443,7 @@ However, it should only be used with caution as
 
 **Discretization:** Reduces a numeric feature to a set of categorical features
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-26-1.png" width="576" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-15-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 In certain cases, binning helps to reduce complexity in the relationship between `\(X\)` and `\(Y\)` and hence facilitates the interpretation.
@@ -462,7 +469,7 @@ However, it should only be used with caution as
 
 **Dimensionality reduction techniques:** Generate uncorrelated predictors to resolve multicollinearity
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-27-1.png" width="576" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-16-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 The underlying idea of dimensionality reduction techniques is to extract more informative features from the existing feature set. Usually, this comes at the expense of interpretability.
@@ -498,7 +505,7 @@ A good idea is to run the analysis with and without outliers and compare the res
 ### 4.3.2 Outlier Detection 📈
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-28-1.png" width="576" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-17-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 **Boxplots elements:**
@@ -517,7 +524,7 @@ A good idea is to run the analysis with and without outliers and compare the res
 ### 4.3.2 Outlier Detection 💹
 
 .pull-left[
-&lt;img src="index_files/figure-html/unnamed-chunk-29-1.png" width="576" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-18-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 .pull-right[
 **Scatterplots with marginal densities:** Convenient tool for identifying outliers in two dimensions
@@ -561,7 +568,7 @@ A more sophisticated, multidimensional approach goes by the name of **Cook's dis
 
 ]
 .pull-right[
-&lt;img src="index_files/figure-html/unnamed-chunk-30-1.png" width="576" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-19-1.png" width="576" style="display: block; margin: auto;" /&gt;
 ]
 
 .footnote[.pull-left[
@@ -615,8 +622,8 @@ Often, it is really non-trivial to come by the reason of an NA:
 ### 4.4.2 Missing Value Detection
 
 .pull-left[
-**Missing value heatmap:** 📉
-&lt;img src="index_files/figure-html/unnamed-chunk-32-1.png" width="576" style="display: block; margin: auto auto auto 0;" /&gt;
+**Missing value heatmap:** 💹
+&lt;img src="index_files/figure-html/unnamed-chunk-21-1.png" width="576" style="display: block; margin: auto auto auto 0;" /&gt;
 ]
 .pull-right[
 **Check number of `NA` per feature:** 🧮
