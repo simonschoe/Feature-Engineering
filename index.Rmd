@@ -325,13 +325,6 @@ If a feature is considered a zv feature, a potential remedy is to lump together 
 
 ---
 
-layout: false
-class: center, middle
-
-# 5-Minute Break<br><br>`r emo::ji("coffee")` `r emo::ji("doughnut")`
-
----
-
 ## 4.2 Engineering of Numerical Features
 ### 4.2.1 (1:1)-Transformations
 
@@ -573,6 +566,13 @@ The underlying idea of dimensionality reduction techniques is to extract more in
 
 **Partial Least Squares** (**PLS**) **Regression** generates uncorrelated features in a *supervised* manner, i.e. by taking the relationship with the response into account.
 ]
+
+---
+
+layout: false
+class: center, middle
+
+# 5-Minute Break<br><br>`r emo::ji("coffee")` `r emo::ji("doughnut")`
 
 ---
 
